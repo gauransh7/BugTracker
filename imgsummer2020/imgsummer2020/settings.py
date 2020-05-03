@@ -39,8 +39,22 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'BugTracker.apps.BugtrackerConfig',
+    'taggit',
+    'djrichtextfield',
 ]
 AUTH_USER_MODEL = 'BugTracker.User'
+
+DJRICHTEXTFIELD_CONFIG = {
+    'js': ['//tinymce.cachefly.net/4.1/tinymce.min.js'],
+    'init_template': 'djrichtextfield/init/tinymce.js',
+    'settings': {
+        'menubar': False,
+        'plugins': 'link image',
+        'toolbar': 'bold italic | link image | removeformat',
+        'width': 700
+    }
+}
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

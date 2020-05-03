@@ -1,8 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import ugettext_lazy as _
-
+from taggit.managers import TaggableManager
 from .managers import CustomUserManager
+from djrichtextfield.models import RichTextField
 
 
 class User(AbstractUser):
@@ -20,7 +21,7 @@ class User(AbstractUser):
 class Project(models.Model):
     name = models.CharField(max_length=50)
     user = models.ManyToManyField(User)
-    wiki = models.TextField()
+    wiki = RichTextField()
     status = models.BooleanField(default = 1)
     created_on = models.DateTimeField(auto_now_add=True)
 
@@ -45,15 +46,31 @@ STATUS_CHOICES = (
 
 class Bug(models.Model):
     heading = models.CharField(max_length=500)
-    user = models.ForeignKey(User, null=True ,on_delete = models.SET_NULL)
+    user = models.ForeignKey(User, null=True ,related_name='listed_by_user',on_delete = models.SET_NULL)
     listed_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now = True)
+    media = models.FileField(null=True,upload_to = 'bugs_media')
     status = models.CharField(max_length=15,choices = STATUS_CHOICES, default = 'New')
     project = models.ForeignKey(Project,on_delete=models.CASCADE)
-    description = models.CharField(max_length = 10000)
-    
+    description = RichTextField()
+    tags = TaggableManager()
+    assign_to = models.ForeignKey(User,null=True,related_name='assign_to_user',on_delete=models.SET_NULL)
+    assign_by = models.ForeignKey(User,null=True,related_name='assign_by_user',on_delete=models.SET_NULL)
     class Meta:
         ordering = ['-listed_on']
 
     def __str__(self):
         return self.heading
+
+class Comment(models.Model):
+    user = models.ForeignKey(User,null=True,on_delete=models.SET_NULL)
+    bug = models.ForeignKey(Bug,on_delete=models.CASCADE)
+    description = RichTextField()
+    status = models.BooleanField(default = 1)
+    listed_on  = models.DateTimeField(auto_now_add = True)
+
+    class Meta:
+        ordering = ['-listed_on']
+
+    def __str__(self):
+        return self.description
