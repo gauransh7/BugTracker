@@ -49,13 +49,13 @@ class Bug(models.Model):
     user = models.ForeignKey(User, null=True ,related_name='listed_by_user',on_delete = models.SET_NULL)
     listed_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now = True)
-    media = models.FileField(null=True,upload_to = 'bugs_media')
+    media = models.FileField(null=True,upload_to = 'bugs_media',blank=True)
     status = models.CharField(max_length=15,choices = STATUS_CHOICES, default = 'New')
     project = models.ForeignKey(Project,on_delete=models.CASCADE)
     description = RichTextField()
     tags = TaggableManager()
-    assign_to = models.ForeignKey(User,null=True,related_name='assign_to_user',on_delete=models.SET_NULL)
-    assign_by = models.ForeignKey(User,null=True,related_name='assign_by_user',on_delete=models.SET_NULL)
+    assign_to = models.ForeignKey(User,null=True,blank=True,related_name='assign_to_user',on_delete=models.SET_NULL)
+    assign_by = models.ForeignKey(User,null=True,blank=True,related_name='assign_by_user',on_delete=models.SET_NULL)
     class Meta:
         ordering = ['-listed_on']
 

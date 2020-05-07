@@ -19,5 +19,7 @@ from django.urls import include, path
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('djrichtextfield/', include('djrichtextfield.urls'))
+    path('djrichtextfield/', include('djrichtextfield.urls')),
+    path('BugTracker/', include('BugTracker.urls')),
+    path('api-auth/', include('rest_framework.urls')),
 ]
