@@ -20,6 +20,7 @@ class User(AbstractUser):
 
 class Project(models.Model):
     name = models.CharField(max_length=50)
+    creator = models.ForeignKey(User, null=True ,related_name='project_creator',on_delete = models.SET_NULL)
     user = models.ManyToManyField(User)
     wiki = RichTextField()
     status = models.BooleanField(default = 1)
@@ -45,6 +46,7 @@ STATUS_CHOICES = (
 )
 
 class Bug(models.Model):
+    readonly_fields=('heading','description','tags',)
     heading = models.CharField(max_length=500)
     user = models.ForeignKey(User, null=True ,related_name='listed_by_user',on_delete = models.SET_NULL)
     listed_on = models.DateTimeField(auto_now_add=True)
@@ -56,6 +58,8 @@ class Bug(models.Model):
     tags = TaggableManager()
     assign_to = models.ForeignKey(User,null=True,blank=True,related_name='assign_to_user',on_delete=models.SET_NULL)
     assign_by = models.ForeignKey(User,null=True,blank=True,related_name='assign_by_user',on_delete=models.SET_NULL)
+    
+    
     class Meta:
         ordering = ['-listed_on']
 

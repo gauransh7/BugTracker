@@ -11,7 +11,13 @@ class ProjectSerializer(serializers.ModelSerializer):
         model = Project
         fields = '__all__'
 
-class BugSerializer(serializers.ModelSerializer):
+class BugSerializer(serializers.ModelSerializer):     
+    def update(self, instance, validated_data):
+        validated_data.pop('heading', None) 
+        validated_data.pop('description', None) 
+        validated_data.pop('user', None)  # prevent heading from being updated
+        return super().update(instance, validated_data)
+
     class Meta:
         model = Bug
         fields = '__all__'
