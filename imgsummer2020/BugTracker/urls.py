@@ -3,11 +3,11 @@ from rest_framework.routers import DefaultRouter
 from BugTracker import views
 from rest_framework_extensions.routers import NestedRouterMixin
 
-router = DefaultRouter()
-# router.register(r'users', views.UserViewSet)
-# router.register(r'Project', views.ProjectViewSet)
-router.register(r'Bug', views.BugViewSet)
-router.register(r'Comment', views.CommentViewSet)
+# router = DefaultRouter()
+# # router.register(r'users', views.UserViewSet)
+# # router.register(r'Project', views.ProjectViewSet)
+# router.register(r'Bug', views.BugViewSet)
+# router.register(r'Comment', views.CommentViewSet)
 
 class NestedDefaultRouter(NestedRouterMixin, DefaultRouter):
     pass
@@ -42,4 +42,5 @@ bug_router.register(
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('auth',views.AuthView.as_view()),
 ]

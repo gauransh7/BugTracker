@@ -26,3 +26,10 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = '__all__'
+
+class AuthSerializer(serializers.Serializer):
+    client_id = serializers.CharField(required=True)
+    client_secret = serializers.CharField(required=True)
+    grant_type = serializers.CharField(required=True)
+    redirect_url = serializers.CharField(required=True)
+    code = serializers.CharField(required=True)

@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import ugettext_lazy as _
 from taggit.managers import TaggableManager
-from .managers import CustomUserManager
+from BugTracker.managers import CustomUserManager
 from djrichtextfield.models import RichTextField
 
 
@@ -25,6 +25,8 @@ class Project(models.Model):
     wiki = RichTextField()
     status = models.BooleanField(default = 1)
     created_on = models.DateTimeField(auto_now_add=True)
+
+    objects = models.Manager()
 
     class Meta:
         ordering = ['-created_on']
@@ -58,6 +60,8 @@ class Bug(models.Model):
     tags = TaggableManager()
     assign_to = models.ForeignKey(User,null=True,blank=True,related_name='assign_to_user',on_delete=models.SET_NULL)
     assign_by = models.ForeignKey(User,null=True,blank=True,related_name='assign_by_user',on_delete=models.SET_NULL)
+
+    objects = models.Manager()
     
     
     class Meta:
@@ -72,6 +76,8 @@ class Comment(models.Model):
     description = RichTextField()
     status = models.BooleanField(default = 1)
     listed_on  = models.DateTimeField(auto_now_add = True)
+
+    objects = models.Manager()
 
     class Meta:
         ordering = ['-listed_on']
