@@ -7,12 +7,11 @@ from rest_framework import viewsets
 from BugTracker.models import User,Bug,Project,Comment
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from BugTracker.serializers import UserSerializer,ProjectSerializer,BugSerializer,CommentSerializer,AuthSerializer
+from BugTracker.serializers import UserSerializer,ProjectSerializer,BugSerializer,CommentSerializer,AuthSerializer,AuthTokenSerializer
 from rest_framework import permissions
 from BugTracker.permissions import HasProjectPermissions, HasBugPermissions, HasCommentPermissions
 from rest_framework_extensions.mixins import NestedViewSetMixin
 from django.contrib.auth import login
-from rest_framework.authtoken.serializers import AuthTokenSerializer
 from knox.views import LoginView as KnoxLoginView
 
 # Create your views here.
@@ -22,7 +21,7 @@ class UserViewSet(NestedViewSetMixin,viewsets.ModelViewSet):
     serializer_class = UserSerializer
 
 class ProjectViewSet(NestedViewSetMixin,viewsets.ModelViewSet):
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly,HasProjectPermissions]
+    permission_classes = [permissions.IsAuthenticated,HasProjectPermissions]
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
 
@@ -61,8 +60,7 @@ class AuthView(APIView):
             except:
                 return HttpResponse("error at login response")
             if login_response.status_code==200:
-                return Response(login_response.json())
-
+                return Response(login_response.text)
 
 
         return Response(token_response.json())
@@ -81,16 +79,13 @@ class LoginView(KnoxLoginView):
             try:
                 user = User.objects.get(enr_no=user_data['student']['enrolmentNumber'])
                 try:
-                    try:
-                        serializer = AuthTokenSerializer(data={'enr_no': user['enr_no']})
-                    except:
-                        return HttpResponse("serializer error")
-                    serializer.is_valid(raise_exception=True)
-                    user = serializer.validated_data['user']
-                    login(request, user)
-                    return super(LoginView, self).post(request, format=None)
+                    serializer = AuthTokenSerializer(data={'enr_no': user.enr_no})
                 except:
-                    return HttpResponse(("error at token generation"))
+                    return HttpResponse("serializer error")
+                serializer.is_valid(raise_exception=True)
+                user = serializer.validated_data['user']
+                login(request, user)
+                return super(LoginView, self).post(request, format=None)
             except User.DoesNotExist:
                 #create a user
                 #check img member
