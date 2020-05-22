@@ -1,6 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from BugTracker import views
+from knox import views as knox_views
 from rest_framework_extensions.routers import NestedRouterMixin
 
 # router = DefaultRouter()
@@ -43,4 +44,7 @@ bug_router.register(
 urlpatterns = [
     path('', include(router.urls)),
     path('auth',views.AuthView.as_view()),
+    path('api-auth/login/', views.LoginView.as_view(), name='knox_login'),
+    path('api-auth/logout/', knox_views.LogoutView.as_view(), name='knox_logout'),
+    path('api-auth/logoutall/', knox_views.LogoutAllView.as_view(), name='knox_logoutall'),
 ]

@@ -42,7 +42,7 @@ class HasProjectPermissions(permissions.BasePermission):
             return True
         # Instance must have an attribute named `owner`.
 
-        return request.user in obj.user.all()
+        return request.user in users
 
 
 class HasBugPermissions(permissions.BasePermission):

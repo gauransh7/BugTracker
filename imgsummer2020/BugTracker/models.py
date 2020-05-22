@@ -4,19 +4,24 @@ from django.utils.translation import ugettext_lazy as _
 from taggit.managers import TaggableManager
 from BugTracker.managers import CustomUserManager
 from djrichtextfield.models import RichTextField
+from django.utils import timezone
 
 
 class User(AbstractUser):
     username = None
+    last_name = None
+    password = None
+    enr_no = models.BigIntegerField(null=False,unique=True,blank=False)
+    cur_yr = models.IntegerField(null=True)
     email = models.EmailField(_('email address'), unique=True)
     image = models.ImageField(default='default.jpg', upload_to='profile_images')
-    USERNAME_FIELD = 'email'
+    USERNAME_FIELD = 'enr_no'
     REQUIRED_FIELDS = []
 
     objects = CustomUserManager()
 
     def __str__(self):
-        return self.email
+        return self.enr_no
 
 class Project(models.Model):
     name = models.CharField(max_length=50)
