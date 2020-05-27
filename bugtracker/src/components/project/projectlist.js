@@ -4,9 +4,24 @@ import {
     Card,Icon,Grid,Search
   } from "semantic-ui-react";
 import {connect} from 'react-redux'
+import propTypes from 'prop-types'
+import { getProjects } from '../../actions/projectAction'
+import { deleteProject} from '../../actions/projectAction'
 
   
-class Login extends Component{
+class Projectlist extends Component{
+
+  static propTypes = {
+    projects : propTypes.array.isRequired,
+    getProjects : propTypes.func.isRequired,
+    deleteProject : propTypes.func.isRequired
+  }
+
+  componentDidMount(){
+    this.props.getProjects()
+  }
+
+
   render(){
     const { posts } = this.props;
     const postlist = posts.length ? (
@@ -31,6 +46,7 @@ class Login extends Component{
           <Card.Content extra>
               <Icon name='user' />
               Gauransh Dingwani
+              <Icon name="delete" color="red" onClick={this.props.deleteProject.bind(this,post.id)} />
           </Card.Content>
         </Card>
       })
@@ -122,8 +138,8 @@ class Login extends Component{
 
     const mapStateToProps = (state) => {
       return{
-          posts : state.posts
+          posts : state.project.posts
       }
   }
 
-  export default connect(mapStateToProps)(Login)
+  export default connect(mapStateToProps, { getProjects , deleteProject})(Projectlist)
