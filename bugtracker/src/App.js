@@ -4,6 +4,8 @@ import NavBar from './components/navbar';
 import projectlist from "./components/project/projectlist";
 import AddProject from './components/project/addProject';
 import { BrowserRouter, Route } from "react-router-dom";
+import Alert from './components/layout/alert'
+
 
 const rightItems = [
   { as: "a", content: "home", key: "home" },
@@ -17,9 +19,11 @@ class App extends Component{
       <div className="App">
         <NavBar rightItems={rightItems} />
         <Route exact path='/' component={projectlist} />
+        <Alert />
         <Route path='/addproject' component={AddProject} />
       </div>
       </BrowserRouter>
+
     );
   }
 }

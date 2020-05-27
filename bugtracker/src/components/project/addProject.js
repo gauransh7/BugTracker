@@ -43,6 +43,11 @@ handleChange = (e, { name, value }) => this.setState({ [name]: value })
       const project = { name, wiki, creator : parseInt(creator) }
       this.props.createProject(project)
       console.log(project)
+      this.setState(
+        {name : '',
+        wiki : '',
+        creator : ''
+        })
   }
 
   render() {

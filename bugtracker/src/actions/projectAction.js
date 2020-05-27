@@ -1,5 +1,5 @@
 import axios from 'axios'
-
+import { createMessage }  from './messages'
 
 // export const createProject = (project) => {
 //     return  (dispatch, getState ) =>{
@@ -11,6 +11,7 @@ import axios from 'axios'
 export const createProject = (project) => dispatch => {
     axios.post(`http://localhost:8000/BugTracker/projects/`,project)
         .then(res =>{
+            dispatch(createMessage({ ProjectAdd: 'Project Added Without Error'}));
             dispatch(
                 {
                     type:'CREATE_PROJECT',
@@ -19,7 +20,18 @@ export const createProject = (project) => dispatch => {
             )
         }
         )
-        .catch(err => console.log(err.response.data))
+        .catch(err => {
+            const error = {
+                msg : err.response.data,
+                status : err.response.status
+            }
+            dispatch(
+                {
+                    type : 'GET_ERRORS',
+                    payload : error
+                }
+            )
+        })
 }
 
 
@@ -42,6 +54,7 @@ export const getProjects = () => dispatch =>{
 export const deleteProject = (id) => dispatch => {
     axios.delete(`http://localhost:8000/BugTracker/projects/${id}/`)
         .then(res =>{
+            dispatch(createMessage({ ProjectDelete: 'Project Deleted Without Error'}));
             dispatch(
                 {
                     type:'DELETE_PROJECT',

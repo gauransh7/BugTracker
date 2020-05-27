@@ -5,10 +5,17 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 import 'semantic-ui-css/semantic.min.css';
 import { createStore, applyMiddleware} from 'redux';
+import { Provider as AlertProvider } from 'react-alert'
+import AlertTemplate from 'react-alert-template-basic'
 import { Provider } from 'react-redux';
 import rootReducer from './reducers/rootReducer'
 import thunk from 'redux-thunk'
 import { composeWithDevTools } from 'redux-devtools-extension'
+
+const alertOptions = {
+  timeout : 3000,
+  position :'bottom center'
+}
 
 
 const store = createStore(rootReducer,composeWithDevTools(applyMiddleware(thunk)))
@@ -17,9 +24,11 @@ const store = createStore(rootReducer,composeWithDevTools(applyMiddleware(thunk)
 
 ReactDOM.render(
   <Provider store={store}>
+  <AlertProvider template={AlertTemplate} {...alertOptions}>
   <React.StrictMode>
     <App />
   </React.StrictMode>
+  </AlertProvider>
   </Provider>,
   document.getElementById('root')
 );
