@@ -1,13 +1,18 @@
-import React from 'react';
-import _ from "lodash";
+import React, { Component } from 'react';
+// import _ from "lodash";
+import { connect } from 'react-redux'
 import {
     Menu,
     Image,
-    Icon
+    Icon,
+    Button
   } from "semantic-ui-react";
 
-const NavBarDesktop = ({ rightItems }) => (
-  <Menu fixed="top" inverted>
+
+class NavBarDesktop extends Component{ 
+  render(){
+    const { isAuthenticated } = this.props.auth.isAuthenticated;
+    return   <Menu fixed="top" inverted>
     <Menu.Item>
       <Image size="mini" src="https://react.semantic-ui.com/logo.png" />
     </Menu.Item>
@@ -15,9 +20,19 @@ const NavBarDesktop = ({ rightItems }) => (
     <Menu.Item>
       <Icon name="bell" />
     </Menu.Item>
-      {_.map(rightItems, item => <Menu.Item {...item} />)}
+      { isAuthenticated ? <Button>Logout</Button> : <Button>Login</Button>}
+      {/* {_.map(rightItems, item => <Menu.Item {...item} />)} */}
     </Menu.Menu>
   </Menu>
-  );
+  }
 
-export default NavBarDesktop;
+}
+
+
+  const mapStateToProps = (state) => {
+    return {
+      auth : state.auth
+    }
+  }
+
+export default connect(mapStateToProps)(NavBarDesktop);

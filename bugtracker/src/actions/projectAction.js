@@ -21,6 +21,7 @@ export const createProject = (project) => dispatch => {
         }
         )
         .catch(err => {
+            console.log(err.response.data)
             const error = {
                 msg : err.response.data,
                 status : err.response.status

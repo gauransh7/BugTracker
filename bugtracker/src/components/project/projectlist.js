@@ -1,5 +1,5 @@
 import React, {Component}from 'react'
-// import { Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import {
     Card,Icon,Grid,Search
   } from "semantic-ui-react";
@@ -7,7 +7,9 @@ import {connect} from 'react-redux'
 import propTypes from 'prop-types'
 import { getProjects } from '../../actions/projectAction'
 import { deleteProject} from '../../actions/projectAction'
-
+// import axios from 'axios'
+// import { returnErrors } from '../../actions/messages';
+// import {store} from '../../index'
   
 class Projectlist extends Component{
 
@@ -19,6 +21,23 @@ class Projectlist extends Component{
 
   componentDidMount(){
     this.props.getProjects()
+    // if (this.props.location.search) {
+    //   console.log('inside')
+    //   axios.get(`http://localhost:8000/BugTracker/auth${this.props.location.search}`)
+    //         .then(res =>{
+    //           console.log(res.data)
+    //             store.dispatch({
+    //               type : 'LOGIN_SUCCESS',
+    //               payload : res.data
+    //             });
+    //         }
+    //         ).catch(err => {returnErrors(err.response.data,err.response.status)
+    //           store.dispatch({
+    //             type : 'LOGIN_FAIL'
+    //           })
+    //         }
+    //         )
+    // }
   }
 
 
@@ -30,7 +49,7 @@ class Projectlist extends Component{
           <Card.Content>
             <Card.Header>
             {/* <Image className="right" src='https://react.semantic-ui.com/assets/images/avatar/large/matthew.png' /> */}
-              { post.name }
+              <Link to={`/project/${post.id}`}>{ post.name }</Link>
               <Icon className="large right" name="book" />
         </Card.Header>
             <Card.Meta>
@@ -68,7 +87,7 @@ class Projectlist extends Component{
           <Search aligned='right' />
       </Grid.Column>
       <Grid.Column width={2}>
-          <Icon aligned='right' name="add">AddProject</Icon>
+          <Link to='/addproject' ><Icon aligned='right' name="add">AddProject</Icon></Link>
       </Grid.Column>
       </Grid>
       </nav>
