@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import axios from 'axios'
 import {connect} from 'react-redux'
-import { Redirect } from 'react-router-dom'
+// import { Redirect } from 'react-router-dom'
 import { store } from '../index'
 import {returnErrors} from '../actions/messages'
 
@@ -17,6 +17,7 @@ export class getauth extends Component {
                       type : 'LOGIN_SUCCESS',
                       payload : res.data
                     });
+                    window.location.href='http://localhost:3000/'
                 }
                 ).catch(err => {returnErrors(err.response.data,err.response.status)
                   store.dispatch({
@@ -28,10 +29,7 @@ export class getauth extends Component {
       }
 
     render(){
-        if(this.props.auth.token ){
-            console.log("redirecting");
-            return <Redirect to='/' />
-        }
+
         // // const queryString = require('query-string');
         // // const parsed = queryString.parse(this.props.location.search);
         // axios.get(`http://localhost:8000/BugTracker/auth${this.props.location.search}`)
@@ -40,7 +38,7 @@ export class getauth extends Component {
         //     }
         //     ).catch(err => {console.log(err)})
         return (
-            <div>Something Wrong Happenned ... Retry</div>
+            <div>Loading ...</div>
         )
     }
 }

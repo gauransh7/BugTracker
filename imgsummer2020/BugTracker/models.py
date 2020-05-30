@@ -21,12 +21,12 @@ class User(AbstractUser):
     objects = CustomUserManager()
 
     def __str__(self):
-        return self.enr_no
+        return str(self.enr_no)
 
 class Project(models.Model):
     name = models.CharField(max_length=50)
     creator = models.ForeignKey(User, null=True ,related_name='project_creator',on_delete = models.SET_NULL)
-    user = models.ManyToManyField(User)
+    user = models.ManyToManyField(User,null=True)
     wiki = RichTextField()
     status = models.BooleanField(default = 1)
     created_on = models.DateTimeField(auto_now_add=True)
@@ -38,6 +38,14 @@ class Project(models.Model):
 
     def __str__(self):
         return self.name
+
+    def createdbyname(self):
+        if (self.creator):
+            return self.creator.first_name
+
+    # def usernames(self):
+    #     if (self.user):
+    #         return self.user.first_name
 
 
 STATUS_CHOICES = (
@@ -74,6 +82,14 @@ class Bug(models.Model):
 
     def __str__(self):
         return self.heading
+
+    def createdbyname(self):
+        if (self.user):
+            return self.user.first_name
+
+    def assigntouser(self):
+        if (self.user):
+            return self.assign_to.first_name
 
 class Comment(models.Model):
     user = models.ForeignKey(User,null=True,on_delete=models.SET_NULL)

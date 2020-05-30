@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { createMessage }  from './messages'
+import {tokenConfig} from './auth'
 
 // export const createProject = (project) => {
 //     return  (dispatch, getState ) =>{
@@ -8,8 +9,8 @@ import { createMessage }  from './messages'
 //     } 
 // };
 
-export const createProject = (project) => dispatch => {
-    axios.post(`http://localhost:8000/BugTracker/projects/`,project)
+export const createProject = (project) => (dispatch,getState) => {
+    axios.post(`http://localhost:8000/BugTracker/projects/`,project,tokenConfig(getState))
         .then(res =>{
             dispatch(createMessage({ ProjectAdd: 'Project Added Without Error'}));
             dispatch(
@@ -36,8 +37,8 @@ export const createProject = (project) => dispatch => {
 }
 
 
-export const getProjects = () => dispatch =>{
-    axios.get('http://localhost:8000/BugTracker/projects/')
+export const getProjects = () => (dispatch,getState) =>{
+    axios.get('http://localhost:8000/BugTracker/projects/',tokenConfig(getState))
         .then(res => {
             dispatch(
                 {
@@ -52,8 +53,8 @@ export const getProjects = () => dispatch =>{
         .catch(err => console.log(err))
 };
 
-export const deleteProject = (id) => dispatch => {
-    axios.delete(`http://localhost:8000/BugTracker/projects/${id}/`)
+export const deleteProject = (id) => (dispatch,getState) => {
+    axios.delete(`http://localhost:8000/BugTracker/projects/${id}/`,tokenConfig(getState))
         .then(res =>{
             dispatch(createMessage({ ProjectDelete: 'Project Deleted Without Error'}));
             dispatch(

@@ -7,19 +7,34 @@ import {connect} from 'react-redux'
 import propTypes from 'prop-types'
 import { getProjects } from '../../actions/projectAction'
 import { deleteProject} from '../../actions/projectAction'
+// import {LoadUser} from '../../actions/auth'
+import { AuthenticateUser } from '../../actions/auth'
+import NavBar from '../navbar'
 // import axios from 'axios'
 // import { returnErrors } from '../../actions/messages';
 // import {store} from '../../index'
-  
+ 
+
+
+const rightItems = [
+  { as: "a", content: "home", key: "home" },
+  { as: "a", content: "Login", key: "login" }
+];
+
+
 class Projectlist extends Component{
+
+  
 
   static propTypes = {
     projects : propTypes.array.isRequired,
     getProjects : propTypes.func.isRequired,
-    deleteProject : propTypes.func.isRequired
+    deleteProject : propTypes.func.isRequired,
+    AuthenticateUser : propTypes.func.isRequired
   }
 
   componentDidMount(){
+    this.props.AuthenticateUser()
     this.props.getProjects()
     // if (this.props.location.search) {
     //   console.log('inside')
@@ -73,7 +88,9 @@ class Projectlist extends Component{
       <div>No Projects for testing</div>
     )
 
-    return(<div className="container">
+    return(<div>
+    <NavBar rightItems={rightItems} />
+    <div className="container">
     {/* // <Link to="http://internet.channeli.in/oauth/authorise">
     // <Button className="ui primary button" >Login with omniport</Button>
     // </Link>
@@ -92,6 +109,7 @@ class Projectlist extends Component{
       </Grid>
       </nav>
       { postlist }
+    </div>
     </div>
     )
 
@@ -161,4 +179,4 @@ class Projectlist extends Component{
       }
   }
 
-  export default connect(mapStateToProps, { getProjects , deleteProject})(Projectlist)
+  export default connect(mapStateToProps, { getProjects , AuthenticateUser, deleteProject})(Projectlist)

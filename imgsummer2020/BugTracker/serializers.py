@@ -9,11 +9,15 @@ class UserSerializer(serializers.ModelSerializer):
         fields = '__all__' 
 
 class ProjectSerializer(serializers.ModelSerializer):
+    createdbyname = serializers.ReadOnlyField()   
+    # usernames = serializers.ReadOnlyField()  
     class Meta:
         model = Project
         fields = '__all__'
 
-class BugSerializer(serializers.ModelSerializer):     
+class BugSerializer(serializers.ModelSerializer): 
+    createdbyname = serializers.ReadOnlyField()   
+    assigntouser = serializers.ReadOnlyField()    
     def update(self, instance, validated_data):
         validated_data.pop('heading', None) 
         validated_data.pop('description', None) 

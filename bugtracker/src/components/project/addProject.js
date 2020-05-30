@@ -5,6 +5,8 @@ import {
 } from 'semantic-ui-react'
 import propTypes from 'prop-types'
 import { createProject } from '../../actions/projectAction';
+import { AuthenticateUser } from '../../actions/auth'
+import NavBar from '../navbar'
 
 // const options = [
 //   { key: 'm', text: 'Male', value: 'male' },
@@ -13,13 +15,23 @@ import { createProject } from '../../actions/projectAction';
 // ]
 
 
+const rightItems = [
+  { as: "a", content: "home", key: "home" },
+  { as: "a", content: "Login", key: "login" }
+];
 
 
 class AddProject extends Component {
 
+componentDidMount(){
+  console.log("component mounted")
+  this.props.AuthenticateUser()
+}
+
 
 static propTypes = {
-  createProject : propTypes.func.isRequired
+  createProject : propTypes.func.isRequired,
+  AuthenticateUser : propTypes.func.isRequired
 }
 
   state = {
@@ -53,6 +65,8 @@ handleChange = (e, { name, value }) => this.setState({ [name]: value })
   render() {
     const { name, creator,wiki } = this.state
     return (
+      <div>
+      <NavBar rightItems = { rightItems } />
       <Form onSubmit={this.handleSubmit}>
         <Form.Group widths='equal'>
         <Form.Input
@@ -78,6 +92,7 @@ handleChange = (e, { name, value }) => this.setState({ [name]: value })
             />
             <Form.Button content='Submit' />
       </Form>
+      </div>
     )
   }
 }
@@ -89,4 +104,4 @@ handleChange = (e, { name, value }) => this.setState({ [name]: value })
 // }
 
 
-export default connect(null, { createProject })(AddProject)
+export default connect(null, { createProject, AuthenticateUser })(AddProject)

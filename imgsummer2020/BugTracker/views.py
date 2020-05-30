@@ -3,7 +3,7 @@ import requests
 import json
 from django.urls import reverse
 from django.http import HttpResponse
-from rest_framework import viewsets
+from rest_framework import generics,viewsets
 from BugTracker.models import User,Bug,Project,Comment
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -16,18 +16,20 @@ from knox.views import LoginView as KnoxLoginView
 
 # Create your views here.
 class UserViewSet(NestedViewSetMixin,viewsets.ModelViewSet):
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
 class ProjectViewSet(NestedViewSetMixin,viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated,HasProjectPermissions]
+    # permission_classes = [permissions.AllowAny]
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
 
 
 class BugViewSet(NestedViewSetMixin,viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly,HasBugPermissions]
+    # permission_classes = [permissions.AllowAny]
     queryset = Bug.objects.all()
     serializer_class = BugSerializer
 
@@ -47,7 +49,7 @@ class AuthView(APIView):
                 self.client_secret = 'LU0uRFCz8T7Yv4JF4irTcxBxaYdRamsCTl2SVbL19yxFNEtBy79bp4rtYPB3nZTo8PSHSzUpuhEvb7Ecm9bB9XLXCq11CS8jccC95WSsGwYXNUmNWrlNhhz2KAKhXekR'
                 self.grant_type = 'authorization_code'
                 self.code = code
-                self.redirect_url =  'http://localhost:8000/BugTracker/auth'
+                self.redirect_url =  'http://localhost:3000/#/getauth/'
 
         auth_object = Auth(code)
         serializer = AuthSerializer(auth_object)
@@ -60,7 +62,7 @@ class AuthView(APIView):
             except:
                 return HttpResponse("error at login response")
             if login_response.status_code==200:
-                return Response(login_response.text)
+                return Response(login_response.json())
 
 
         return Response(token_response.json())
@@ -121,7 +123,14 @@ class LoginView(KnoxLoginView):
             return HttpResponse("no access token received")
 
 
+class UserAPI(generics.RetrieveAPIView):
+  permission_classes = [
+    permissions.IsAuthenticated,
+  ]
+  serializer_class = UserSerializer
 
+  def get_object(self):
+    return self.request.user
 
 
 
