@@ -1,0 +1,19 @@
+.buglistmain{
+    margin-top: 5% !important;
+}
+.blsegment{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 82%;
+    margin-left: 17%;
+}
+/* .statussegment{
+    display: none;
+} */
+.trbuglist{
+    position: relative !important;
+}
+.bugtable{
+    position: relative;
+}

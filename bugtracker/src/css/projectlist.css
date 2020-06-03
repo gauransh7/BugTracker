@@ -1,0 +1,43 @@
+.testing-segment{
+    color: chocolate;
+}
+.launched-segment{
+    color: chocolate;
+}
+
+.segment{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 82%;
+    margin-left: 17%;
+    margin-top: 1%;
+}
+/* .plmenu{
+    margin-top: 7% !important;
+} */
+
+.delpro :hover{
+    cursor: pointer;
+}
+
+@media (min-width: 319px) {
+    .plmenu {
+        margin-top: 13% !important;
+    }
+  }
+@media (min-width: 568px) {
+    .plmenu {
+        margin-top: 10% !important;
+    }
+  }
+  @media (min-width: 992px) {
+    .plmenu {
+        margin-top: 5% !important;
+    }
+  }
+  @media (min-width: 1200px) {
+    .plmenu {
+        margin-top: 4% !important;
+    }
+  }

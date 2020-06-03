@@ -12,6 +12,7 @@ import { store } from './index'
 import getauth from "./components/getauth";
 import buglist from "./components/bug/buglist";
 import singleproject from "./components/project/singleproject";
+import commentlist from './components/comment/commentlist'
 
 
 
@@ -29,6 +30,7 @@ class App extends Component{
         <Switch>
         <Route exact path='/' component={Projectlist} />
         <Route exact path='/project/:id/bugs' component={buglist} />
+        <Route exact path='/bugs/:id/comments' component={commentlist} />
         <Route exact path='/project/:id' component={singleproject} />
         <Route exact path='/getauth' component={getauth} />
         <Route exact path='/login' component={Login} />

@@ -32,6 +32,9 @@ export class Alert extends Component{
             if(messages.ProjectDelete){
                 alert.success(messages.ProjectDelete)
             }
+            if(messages.BugDelete){
+                alert.success(messages.BugDelete)
+            }
         }
     }
 
