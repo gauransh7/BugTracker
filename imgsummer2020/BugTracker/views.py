@@ -21,20 +21,20 @@ class UserViewSet(NestedViewSetMixin,viewsets.ModelViewSet):
     serializer_class = UserSerializer
 
 class ProjectViewSet(NestedViewSetMixin,viewsets.ModelViewSet):
-    permission_classes = [permissions.IsAuthenticated,HasProjectPermissions]
+    # permission_classes = [permissions.IsAuthenticated,HasProjectPermissions]
     # permission_classes = [permissions.AllowAny]
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
 
 
 class BugViewSet(NestedViewSetMixin,viewsets.ModelViewSet):
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly,HasBugPermissions]
+    # permission_classes = [permissions.IsAuthenticated,HasBugPermissions]
     # permission_classes = [permissions.AllowAny]
     queryset = Bug.objects.all()
     serializer_class = BugSerializer
 
 class CommentViewSet(NestedViewSetMixin,viewsets.ModelViewSet):
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly,HasCommentPermissions]
+    # permission_classes = [permissions.IsAuthenticated,HasCommentPermissions]
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
 

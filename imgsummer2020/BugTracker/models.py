@@ -30,6 +30,7 @@ class Project(models.Model):
     wiki = RichTextField()
     status = models.BooleanField(default = 1)
     created_on = models.DateTimeField(auto_now_add=True)
+    launched = models.BooleanField(default=0)
 
     objects = models.Manager()
 
@@ -43,9 +44,12 @@ class Project(models.Model):
         if (self.creator):
             return self.creator.first_name
 
-    # def usernames(self):
-    #     if (self.user):
-    #         return self.user.first_name
+    def countbugs(self):
+        return len(list(self.bugs_project.all()))
+
+    def usernames(self):
+        if (self.user):
+            return  list(map(lambda x: x.first_name,self.user.all()))  
 
 
 STATUS_CHOICES = (
@@ -68,7 +72,7 @@ class Bug(models.Model):
     updated_on = models.DateTimeField(auto_now = True)
     media = models.FileField(null=True,upload_to = 'bugs_media',blank=True)
     status = models.CharField(max_length=15,choices = STATUS_CHOICES, default = 'New')
-    project = models.ForeignKey(Project,on_delete=models.CASCADE)
+    project = models.ForeignKey(Project,related_name='bugs_project',on_delete=models.CASCADE)
     description = RichTextField()
     tags = TaggableManager()
     assign_to = models.ForeignKey(User,null=True,blank=True,related_name='assign_to_user',on_delete=models.SET_NULL)
@@ -91,6 +95,9 @@ class Bug(models.Model):
         if (self.user):
             return self.assign_to.first_name
 
+    def projectname(self):
+        return self.project.name
+
 class Comment(models.Model):
     user = models.ForeignKey(User,null=True,on_delete=models.SET_NULL)
     bug = models.ForeignKey(Bug,on_delete=models.CASCADE)
@@ -105,3 +112,7 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.description
+
+    def username(self):
+        if (self.user):
+            return self.user.first_name

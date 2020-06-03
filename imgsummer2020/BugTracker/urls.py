@@ -41,6 +41,8 @@ bug_router.register(
     parents_query_lookups = ['bug']
 )
 
+comment_router = router.register('comments',views.CommentViewSet)
+
 urlpatterns = [
     path('', include(router.urls)),
     path('auth',views.AuthView.as_view()),

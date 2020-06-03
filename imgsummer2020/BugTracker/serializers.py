@@ -9,15 +9,17 @@ class UserSerializer(serializers.ModelSerializer):
         fields = '__all__' 
 
 class ProjectSerializer(serializers.ModelSerializer):
-    createdbyname = serializers.ReadOnlyField()   
-    # usernames = serializers.ReadOnlyField()  
+    createdbyname = serializers.ReadOnlyField()  
+    countbugs = serializers.ReadOnlyField() 
+    usernames = serializers.ReadOnlyField()  
     class Meta:
         model = Project
         fields = '__all__'
 
 class BugSerializer(serializers.ModelSerializer): 
-    createdbyname = serializers.ReadOnlyField()   
-    assigntouser = serializers.ReadOnlyField()    
+    createdbyname = serializers.ReadOnlyField()  
+    assigntouser = serializers.ReadOnlyField()  
+    projectname = serializers.ReadOnlyField()  
     def update(self, instance, validated_data):
         validated_data.pop('heading', None) 
         validated_data.pop('description', None) 
@@ -29,6 +31,7 @@ class BugSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class CommentSerializer(serializers.ModelSerializer):
+    username = serializers.ReadOnlyField()   
     class Meta:
         model = Comment
         fields = '__all__'
