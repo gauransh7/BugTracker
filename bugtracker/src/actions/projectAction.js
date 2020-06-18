@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { createMessage }  from './messages'
 import {tokenConfig} from './auth'
+import { Redirect } from 'react-router-dom';
 
 // export const createProject = (project) => {
 //     return  (dispatch, getState ) =>{
@@ -9,8 +10,23 @@ import {tokenConfig} from './auth'
 //     } 
 // };
 
-export const createProject = (project) => (dispatch,getState) => {
-    axios.post(`http://localhost:8000/BugTracker/projects/`,project,tokenConfig(getState))
+export const createProject = (formData) => (dispatch,getState) => {
+     // Get token from state
+     const token = getState().auth.token;
+      
+     // Headers
+     const config = {
+       headers: {
+        //  'Content-Type': 'application/json'
+       },
+     };
+   
+     // If token, add to headers config
+     if (token) {
+       config.headers['Authorization'] = `Token ${token}`;
+    //    config.headers['Accept'] = 'multipart/form-data'
+     }
+    axios.post(`http://localhost:8000/BugTracker/projects/`,formData,config)
         .then(res =>{
             dispatch(createMessage({ ProjectAdd: 'Project Added Without Error'}));
             dispatch(
@@ -19,6 +35,7 @@ export const createProject = (project) => (dispatch,getState) => {
                     payload : res.data
                 }
             )
+            window.location.href='http://localhost:3000/'
         }
         )
         .catch(err => {

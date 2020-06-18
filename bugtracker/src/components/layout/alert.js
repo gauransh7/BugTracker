@@ -35,6 +35,15 @@ export class Alert extends Component{
             if(messages.BugDelete){
                 alert.success(messages.BugDelete)
             }
+            if(messages.StatusChange){
+                alert.success(messages.StatusChange)
+            }
+            if(messages.StatusPermission){
+                alert.success(messages.StatusPermission)
+            }
+            if(messages.BUGASSIGNED){
+                alert.success(messages.BUGASSIGNED)
+            }
         }
     }
 

@@ -4,6 +4,7 @@ import {connect} from 'react-redux'
 // import { Redirect } from 'react-router-dom'
 import { store } from '../index'
 import {returnErrors} from '../actions/messages'
+import { Loader ,Segment,Dimmer} from 'semantic-ui-react'
 
 export class getauth extends Component {
 
@@ -38,7 +39,11 @@ export class getauth extends Component {
         //     }
         //     ).catch(err => {console.log(err)})
         return (
-            <div>Loading ...</div>
+            <Segment className='fullscreen' style={{'background-color':'black','height':'-webkit-fill-available','width':'auto'}}>
+            <Dimmer className='fullscreen' active>
+              <Loader className='center' indeterminate>GOOD THINGS TAKE TIME</Loader>
+            </Dimmer>
+          </Segment>
         )
     }
 }

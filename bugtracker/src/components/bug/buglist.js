@@ -3,7 +3,7 @@ import axios from 'axios'
 import { tokenConfig } from '../../actions/auth'
 import { connect} from 'react-redux'
 import {store} from '../../index'
-import { Grid,Search,Icon,Label, Button,Menu,Breadcrumb, Popup, Segment} from 'semantic-ui-react'
+import { Grid,Search,Icon,Label, Button,Menu,Breadcrumb, Popup, Segment,Loader,Dimmer} from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import NavBar  from '../navbar'
 import { Table } from 'semantic-ui-react'
@@ -40,29 +40,14 @@ const rightItems = [
 
 class buglist extends Component{ 
 
-    static propTypes = {
-        tokenConfig : propTypes.func.isRequired,
-        deleteProject : propTypes.func.isRequired,
-        AuthenticateUser:propTypes.func.isRequired,
-        createMessage : propTypes.func.isRequired,
-        returnErrors : propTypes.func.isRequired
-    }
 
-
-    state = {
+  constructor(props){
+    super(props)
+    this.state = {
       deletingbug : false,
         staff : false,
         bugs : [],
         statuses : [
-            'new',
-            'assigned',
-            'duplicate',
-            'not a bug',
-            'open',
-            'fixed',
-            'retesting',
-            'verified',
-            'closed',
         ],
         colors : [
             'red',
@@ -74,8 +59,22 @@ class buglist extends Component{
             'blue',
             'violet',
             'purple',
-        ]
+        ],
+        isloading : true,
+        loaderror : false
     }
+}
+
+    static propTypes = {
+        tokenConfig : propTypes.func.isRequired,
+        deleteProject : propTypes.func.isRequired,
+        AuthenticateUser:propTypes.func.isRequired,
+        createMessage : propTypes.func.isRequired,
+        returnErrors : propTypes.func.isRequired
+    }
+
+
+    
 
     deletebug = (id) => {
       axios.delete(`http://localhost:8000/BugTracker/bugs/${id}/`,tokenConfig(store.getState))
@@ -118,23 +117,43 @@ class buglist extends Component{
         console.log(tokenConfig(store.getState))
         axios.get(`http://localhost:8000/BugTracker/projects/${id}/`, tokenConfig(store.getState))
             .then(res =>{
+
+              if(res.status === 200 && res.data.id){
                 console.log(res.data)
                 this.setState({
                     ...this.state,
-                   ...res.data
+                   ...res.data,
                 })
                 console.log(this.state)
+            }
+            else{
+                this.setState({...this.state,
+                  loaderror:true})
+            }
+
+                
+
 
             }
 
-            ).catch(err => console.log(err))
+            ).catch(err => {
+              if(err.response && err.response.status === 401){
+                window.location.href = 'http://loacalhost:3000/Login'
+            }
+            this.setState({loaderror:true,isLoading:false })})
         axios.get(`http://localhost:8000/BugTracker/projects/${id}/bugs/`,tokenConfig(store.getState))
             .then(res => {
+              if(res.status === 200 && res.data){
                 console.log(Object.keys(res.data).length)
                 this.setState({
                     ...this.state,
                     bugs : [...res.data]
                 })
+              }
+              else{
+                this.setState({...this.state,
+                  loaderror:true})
+              }
         //        console.log(this.state)
          //       console.log(this.state.name)
                 // console.log(this.props.auth)
@@ -155,13 +174,48 @@ class buglist extends Component{
                 //     }
                 // })
             })
+            .catch(err => {
+              if(err.response && err.response.status === 401){
+                window.location.href = 'http://loacalhost:3000/Login'
+            }
+            this.setState({loaderror:true,isLoading:false })})
+
             this.setState({
                 staff : this.props.auth.is_staff
               })
               console.log(this.props)
 
     }
+
+    getstatuses = () => {
+      this.state.bugs.map(bug => {
+          let x = false;
+          for(let i=0;i<this.state.statuses.length;i++){
+              if(this.state.statuses[i]===bug.status){
+                x=true;
+                break;
+              }
+
+          }
+          if(!x){
+            this.setState({
+                ...this.state,
+                statuses : [...this.state.statuses,bug.status]
+            })
+          }
+      })
+  }
     render(){
+      var permission = false;
+      this.getstatuses()
+      if (this.state.user && this.props.auth.id){
+        for(let x=0;x<this.state.user.length;x++){
+          if(this.state.user[x]===this.props.auth.id){
+            permission=true;
+            break;
+          }
+        }
+      }
 
         // const showsegment = (name) =>{
         //     document.getElementById(name).style.display='visible'
@@ -198,37 +252,35 @@ class buglist extends Component{
                         const formattedDate = Moment(date).format("LL");
                         return (
                           <Table.Row key={bug.id}>
-                            <Table.Cell className='center aligned six column wide'>{bug.heading}</Table.Cell>
+                            <Table.Cell className='center aligned six column wide'><Link style={{'color':"black"}} to={`/bugs/${bug.id}/comments`}><Icon name='eye' style={{'float':'left'}} size='normal' className='left floated' /> {bug.heading}</Link></Table.Cell>
                             <Table.Cell className='center aligned six column wide'>{formattedDate}</Table.Cell>
-                            <Table.Cell  className='trbuglist center aligned six column wide'>
+                            <Table.Cell className='trbuglist center aligned six column wide'>
                               {bug.assigntouser ? (
                                 bug.assigntouser
                               ) : (
                                 <span>--NOT ASSIGNED--</span>
                               )}
 
-                              
                                 {this.props.auth.is_staff ? (
                                   true
                                 ) : false ||
                                   this.props.auth.id === this.state.creator ||
-                                  this.props.auth.id in this.state.user ? (
-                                  true
-                                ) : false ||
+                                  permission||
                                   this.props.auth.id === bug.user ||
                                   this.props.auth.id === bug.assign_to ? (
-                                    <Label basic className='right floated' floating onClick = {() => {this.deletebug(bug.id)}} >
+                                    <span>
                                   <Popup
                                     trigger={
                                       <Icon
-                                        name="delete"
+                                      style={{'float':'right'}}
+                                        name="trash"
                                         color="red"
                                       />
                                     }
                                     
                                     content="Clicking on this will permanently DELETE this bug"
                                   />
-                                  </Label>
+                                  </span>
                                 ) : (
                                   ""
                                 )}
@@ -268,21 +320,41 @@ class buglist extends Component{
         //     )
 
 
-        return (<div>
+        return (
+          <div>
+                {this.state.isLoading?<Segment className='fullscreen' style={{'background-color':'black','height':'-webkit-fill-available','width':'auto'}}>
+            <Dimmer className='fullscreen' active>
+              <Loader className='center' indeterminate>GOOD THINGS TAKE TIME</Loader>
+            </Dimmer>
+          </Segment>:
+                (this.state.loaderror)?<Segment className='fullscreen' style={{'background-color':'black','height':'-webkit-fill-available','width':'auto'}}>
+            <Dimmer className='fullscreen' active>
+              <span><p>SOMETHING WRONG HAPPENED ! </p><p> -- CHECK THE URL YOU WANT TO ACCESS --  </p><p> -- PLEASE TRY RELOAD OR CONTACT ADMIN -- </p></span>
+            </Dimmer>
+          </Segment> :
+                <div>
             <NavBar rightItems={rightItems} />
             <div className="ui">
               <div className="container ui">
                 <Menu borderless className="ui plmenu">
                   <Menu.Item>
                     <Breadcrumb>
-                      <Breadcrumb.Section style={{ color: "black" }} as={Link} to='/' >
+                      <Breadcrumb.Section
+                        style={{ color: "black" }}
+                        as={Link}
+                        to="/"
+                      >
                         Projects
                       </Breadcrumb.Section>
                       <Breadcrumb.Divider
                         icon="right chevron"
                         style={{ color: "darkblue" }}
                       />
-                      <Breadcrumb.Section style={{ color: "black" }} as={Link} to={`/project/${this.props.match.params.id}`}>
+                      <Breadcrumb.Section
+                        style={{ color: "black" }}
+                        as={Link}
+                        to={`/project/${this.props.match.params.id}`}
+                      >
                         {this.state.name}
                       </Breadcrumb.Section>
                       <Breadcrumb.Divider
@@ -294,34 +366,49 @@ class buglist extends Component{
                       </Breadcrumb.Section>
                     </Breadcrumb>
                   </Menu.Item>
+                  <Menu.Item position="right" as={Link} to={`/project/${this.props.match.params.id}/addbug/`}>
+                    <Button basic icon labelPosition="right">
+                      <Icon name="add" size="normal" />
+                      Add Bug
+                    </Button>
+                  </Menu.Item>
                 </Menu>
               </div>
-            <div className='blsegment '>
-            <Segment basic color={'black'}  className='buglistmain ' >
-            <Label
-                as="a"
-                color={'black'}
-                attached="top left"
-                ribbon
-              >
-                Header
-              </Label>
-            <Table>
-            <Table.Header>
-            <Table.Row>
-                <Table.HeaderCell className='center aligned six column wide'>Heading</Table.HeaderCell>
-                <Table.HeaderCell className='center aligned six column wide'>Date</Table.HeaderCell>
-                <Table.HeaderCell className='center aligned six column wide'>Assign To</Table.HeaderCell>
-            </Table.Row>
-            </Table.Header>
-            </Table>
-            </Segment>
+              <div className="blsegment ">
+                <Segment basic color={"black"} className="buglistmain ">
+                  <Label as="a" color={"black"} attached="top left" ribbon>
+                    Header
+                  </Label>
+                  <Table>
+                    <Table.Header>
+                      <Table.Row>
+                        <Table.HeaderCell className="center aligned six column wide">
+                          Heading
+                        </Table.HeaderCell>
+                        <Table.HeaderCell className="center aligned six column wide">
+                          Date
+                        </Table.HeaderCell>
+                        <Table.HeaderCell className="center aligned six column wide">
+                          Assign To
+                        </Table.HeaderCell>
+                      </Table.Row>
+                    </Table.Header>
+                  </Table>
+                </Segment>
                 {fullbuglist}
+              </div>
+            </div>
+          </div>
+                }
             </div>
 
-            </div>
-            </div>
-                )
+
+
+
+
+
+          
+        );
     }
 }
 

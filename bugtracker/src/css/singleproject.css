@@ -1,0 +1,53 @@
+@media (max-width: 568px) {
+    .editbuttonsp{
+        display: none !important;
+    }
+    .delbuttonsp{
+        display: none !important;
+    }
+    .bugbuttonsp{
+        display: none !important;
+    }
+    .addbugbuttonsp{
+        display: none !important;
+    }
+    .editiconsp{
+        display: visible !important;
+    }
+    .deliconsp{
+        display: visible !important;
+    }
+    .bugiconsp{
+        display: visible !important;
+    }
+    .addbugiconsp{
+        display: visible !important;
+    }
+  }
+
+  @media (min-width: 568px) {
+    .editbuttonsp{
+        display: visible !important;
+    }
+    .delbuttonsp{
+        display: visible !important;
+    }
+    .bugbuttonsp{
+        display: visible !important;
+    }
+    .addbugbuttonsp{
+        display: visible !important;
+    }
+    .editiconsp{
+        display: none !important;
+    }
+    .deliconsp{
+        display: none !important;
+    }
+    .bugiconsp{
+        display: none !important;
+    }
+    .addbugiconsp{
+        display: none !important;
+    }
+  }

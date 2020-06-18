@@ -29,18 +29,31 @@ const options = [
 
 
 
-class NavBarDesktop extends Component{ 
+class NavBarDesktop extends Component{
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      username : this.props.auth.first_name,
+      isLoading : true
+    };
+  }
   componentDidMount(){
     // this.setState({
-      
+
     // })
     console.log(this.props.auth)
   }
 
-  state = {
-    username : this.props.auth.first_name
-  }
+  // componentWillMount(){
+  //   this.setState({
+  //     ...this.state,
+  //     isLoading : false
+  //   })
+  // }
   render(){
+
+    
     // let { isAuthenticated } = this.state.isAuthenticated;
     // console.log(this.state.isAuthenticated);
     console.log(this.props.auth)
@@ -61,9 +74,7 @@ class NavBarDesktop extends Component{
           
         />
         {/* </Link> */}
-    <Menu.Item>
-      <Icon size='normal' name="bell" />
-    </Menu.Item>
+        <Menu.Item as={Link} to='/admin' name='admin'>ADMIN</Menu.Item>
     <Menu.Item>
     <Dropdown
     trigger= { <span>
@@ -81,7 +92,7 @@ class NavBarDesktop extends Component{
       {/* { this.props.auth.isAuthenticated ? <Button onClick={() => this.props.Logout()}>Logout</Button> : <Button>Login</Button>} */}
       {/* {_.map(rightItems, item => <Menu.Item {...item} />)} */}
     </Menu.Menu>
-  </Menu>
+  </Menu> 
   }
 
 }

@@ -3,15 +3,16 @@ import axios from 'axios'
 import { tokenConfig } from '../../actions/auth'
 import { connect} from 'react-redux'
 import {store} from '../../index'
-import { Grid,Icon, Button,Menu,Breadcrumb} from 'semantic-ui-react'
-import { Link } from 'react-router-dom'
+import { Grid,Icon, Button,Menu,Breadcrumb,Card,Image, Feed, Segment, Embed} from 'semantic-ui-react'
+import { Link, Redirect } from 'react-router-dom'
 import NavBar  from '../navbar'
 import { Date} from 'prismic-reactjs';
 import Moment from 'moment'
-import { deleteProject} from '../../actions/projectAction'
+import { deleteProject , getProjects} from '../../actions/projectAction'
 import { AuthenticateUser } from '../../actions/auth'
 // import { returnErrors } from '../../actions/messages'
 import propTypes from 'prop-types'
+import '../../css/singleproject.css'
 
 
 
@@ -24,10 +25,13 @@ const rightItems = [
 
 class singleproject extends Component{ 
 
+
+
     static propTypes = {
         tokenConfig : propTypes.func.isRequired,
         deleteProject : propTypes.func.isRequired,
-        AuthenticateUser: propTypes.func.isRequired
+        AuthenticateUser: propTypes.func.isRequired,
+        getProjects : propTypes.func.isRequired
     }
 
 
@@ -36,6 +40,9 @@ class singleproject extends Component{
     }
 
     componentDidMount(){
+      this.props.AuthenticateUser()
+      this.props.getProjects()
+      console.log(this.state)
         console.log(this.props);
         const id =  this.props.match.params.id;
         console.log(tokenConfig(store.getState))
@@ -63,14 +70,34 @@ class singleproject extends Component{
             )
     }
     render(){
-
+      const { projects } = this.props
+      console.log(projects)
+      console.log(this.props.match.params.id)
+      if(projects && this.props.match.params.id){
+        const show = projects.filter(proj => proj.id === parseInt(this.props.match.params.id)).length ? true : false
+        console.log(!show)
+        if(!show){
+          return <Redirect to='/' />
+        }
+      }
+        console.log(this.state)
         const date = Date(this.state.created_on);
         const formattedDate = Moment(date).format("LL");
+        const teammembers = this.state.usernames ? this.state.usernames.map(user => {
+          return <Feed.Event>
+            <Feed.Label icon='user' />
+            <Feed.Content>
+              <Feed.Summary>
+                {user}
+              </Feed.Summary>
+            </Feed.Content>
+          </Feed.Event>
+        }) : null
 
         return (
-          <div>
+          <div className='container ui'> 
             <NavBar rightItems={rightItems} />
-            <div className="ui">
+            <div className="container ui">
               <div className="container ui">
                 <Menu borderless className="ui plmenu">
                   <Menu.Item>
@@ -89,36 +116,117 @@ class singleproject extends Component{
                   </Menu.Item>
                 </Menu>
               </div>
-              <nav className="nav-wrapper blue container ui segment black-text darken-1">
-                <Grid>
-                  <Grid.Column width={8} textAlign="left" className="border">
-                    <div className="large bold left">{this.state.name}</div>
-                  </Grid.Column>
-                  <Grid.Column width={3}>{formattedDate}</Grid.Column>
-                  <Grid.Column width={3}>
-                    <Icon name="bug">{this.state.countbugs}</Icon>
-                  </Grid.Column>
-                  <Grid.Column width={2}>
-                    <Link to="/addproject">
-                      <Icon aligned="right" name="add">
-                        Bug
-                      </Icon>
-                    </Link>
-                    <Link to={`/project/${this.state.id}/bugs`}>
-                      <Button>Bugs</Button>
-                    </Link>
-                  </Grid.Column>
-                  <div className="large bold left">
-                    {this.state.createdbyname}
-                    {this.state.usernames}
-                  </div>
-                </Grid>
-              </nav>
-              <div className="container ui segment">{this.state.wiki}</div>
+
+
+
+
+
+              <Card fluid style={{'font-variant': 'all-petite-caps',
+    'font-size': 'x-large'}}>
+                <Card.Content>
+                  {/* <Button
+                    as={Link}
+                    to={`/project/${this.props.match.params.id}/addbug/`}
+                    size="small"
+                    floated="right"
+                    basic
+                    icon
+                    color="black"
+                    labelPosition="right"
+                  >
+                    <Icon style={{'color':'black !important'}} name="add" size="normal" basic>
+                    </Icon>
+                    BUG
+                  </Button> */}
+                  <Card.Header style={{ color: "chocolate" }}>
+                  {this.state.image ? (
+                    <Image floated="right" size="mini" src={this.state.image} />
+                  ) : (
+                    <Icon
+                      name="cubes"
+                      className="right floated"
+                      size="normal"
+                    />
+                  )}
+                    PROJECT : {this.state.name}
+                  </Card.Header>
+                  <Card.Meta>{formattedDate}</Card.Meta>
+                  <Card.Description>
+                    <strong style={{'color':'chocolate'}}>CREATED BY : </strong><span>
+                    <Feed  style={{'font-size':'large'}}> 
+                    <Feed.Event >           
+                    <Feed.Label icon='user' />
+            <Feed.Content>
+              <Feed.Summary>
+                {this.state.createdbyname}
+              </Feed.Summary>
+            </Feed.Content>
+          </Feed.Event></Feed></span>
+                  </Card.Description>
+                  <Card.Description>
+                    <strong style={{'color':'chocolate'}}>TEAM MEMBERS : </strong><span><Feed style={{'font-size':'large'}}>{teammembers}</Feed></span>
+                  </Card.Description>
+                </Card.Content>
+                <Embed
+                  url={this.state.attachment}
+                  wrapped
+                />
+                <Card.Content>
+                <p>{this.state.wiki}</p>
+                </Card.Content>
+                <Card.Content extra>
+                  <Button className='delbuttonsp' inverted floated="right" color="red" onClick={this.props.deleteProject.bind(this,this.state.id)} >
+                    Delete
+                  </Button>
+                  <Icon className='deliconsp right floated' size='normal' name='trash' color="red" onClick={this.props.deleteProject.bind(this,this.state.id)}/>
+                  <Link to={`/project/${this.props.match.params.id}/edit/`} ><Icon size='normal' className='editiconsp right floated' name='pencil' color="green" /></Link>
+                  <Button className='editbuttonsp' as={Link} to={`/project/${this.props.match.params.id}/edit/`} inverted floated="right" color="green">
+                    Edit
+                  </Button>
+                  <Link to={`/project/${this.props.match.params.id}/bugs/`} ><Icon size='normal' className='bugiconsp left floated' name='bug' color="red" /></Link>
+                  <Link to={`/project/${this.props.match.params.id}/addbug/`} ><Icon size='normal' className='addbugiconsp left floated' name='add' color="black" /></Link>
+                  <Button
+                  className='bugbuttonsp'
+                  as={Link}
+                  to={`/project/${this.props.match.params.id}/bugs/`}
+                    floated="left"
+                    color="blue"
+                    content="bugs"
+                    icon="bug"
+                    label={{
+                      basic: true,
+                      color: "blue",
+                      pointing: "left",
+                      content: this.state.countbugs,
+                    }}
+                  />
+                  <Button
+                  className='addbugbuttonsp'
+                    as={Link}
+                    to={`/project/${this.props.match.params.id}/addbug/`}
+                    size="small"
+                    floated="left"
+                    basic
+                    icon
+                    color="black"
+                    labelPosition="right"
+                  >
+                    <Icon style={{'color':'black !important'}} name="add" size="normal" basic>
+                    </Icon>
+                    BUG
+                  </Button>
+                </Card.Content>
+              </Card>
             </div>
-          </div>
+          </div> 
         );
     }
 }
 
-  export default connect(null,{deleteProject,AuthenticateUser})(singleproject)
+const mapStateToProps = (state) => {
+  return {
+    projects : state.project.posts
+  }
+}
+
+  export default connect(mapStateToProps,{deleteProject,getProjects,AuthenticateUser})(singleproject)
