@@ -29,7 +29,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-CORS_ORIGIN_ALLOW_ALL = True
 
 # Application definition
 
@@ -41,10 +40,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'corsheaders',
     'knox',
     'BugTracker.apps.BugtrackerConfig',
     'taggit',
     'djrichtextfield',
+    'channels',
+    'taggit_serializer',
 ]
 AUTH_USER_MODEL = 'BugTracker.User'
 
@@ -61,6 +63,8 @@ DJRICHTEXTFIELD_CONFIG = {
 
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -68,9 +72,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
 ]
+
+CORS_ORIGIN_ALLOW_ALL = True
 
 REST_KNOX = {
   'SECURE_HASH_ALGORITHM': 'cryptography.hazmat.primitives.hashes.SHA512',
@@ -82,7 +86,20 @@ REST_KNOX = {
 #   'EXPIRY_DATETIME_FORMAT': api_settings.DATETME_FORMAT,
 }
 
+ASGI_APPLICATION = "imgsummer2020.routing.application"
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
+
 ROOT_URLCONF = 'imgsummer2020.urls'
+
+X_FRAME_OPTIONS = 'ALLOW-FROM https://localhost:3000/'
 
 TEMPLATES = [
     {
@@ -166,3 +183,13 @@ AUTHENTICATION_BACKENDS = [
 # REST_FRAMEWORK = {
 #     'DEFAULT_PERMISSION_CLASSES' : ('rest_framework.permissions.IsAuthenticatedOrReadOnly','BugTracker.permissions.IsOwnerOrReadOnly')
 # }
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'bugs_media')
+MEDIA_URL = '/bugs_media/'
+
+
+MEDIA_ROOT_PROJECT = os.path.join(BASE_DIR, 'project_media')
+MEDIA_URL_PROJECT = '/project_media/'
+
+MEDIA_ROOT_PROJECT_ATTACHMENT = os.path.join(BASE_DIR, 'project_attachment')
+MEDIA_URL_PROJECT_ATTACHMENT = '/project_attachment/'

@@ -1,11 +1,18 @@
 from rest_framework import serializers
-from BugTracker.models import User,Bug,Comment,Project
+from BugTracker.models import User,Bug,Comment,Project,Tag
 from django.contrib.auth import authenticate
 from django.utils.translation import gettext_lazy as _
+from taggit_serializer.serializers import (TagListSerializerField,
+                                           TaggitSerializer)
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
+        fields = '__all__' 
+
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
         fields = '__all__' 
 
 class ProjectSerializer(serializers.ModelSerializer):
@@ -18,8 +25,13 @@ class ProjectSerializer(serializers.ModelSerializer):
 
 class BugSerializer(serializers.ModelSerializer): 
     createdbyname = serializers.ReadOnlyField()  
+    tagname = serializers.ReadOnlyField()
     assigntouser = serializers.ReadOnlyField()  
     projectname = serializers.ReadOnlyField()  
+    projectcreator = serializers.ReadOnlyField()
+    projectuser = serializers.ReadOnlyField()
+    projectcreatorname = serializers.ReadOnlyField()
+    projectusername = serializers.ReadOnlyField()
     def update(self, instance, validated_data):
         validated_data.pop('heading', None) 
         validated_data.pop('description', None) 

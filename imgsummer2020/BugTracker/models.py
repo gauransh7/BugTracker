@@ -25,12 +25,14 @@ class User(AbstractUser):
 
 class Project(models.Model):
     name = models.CharField(max_length=50)
-    creator = models.ForeignKey(User, null=True ,related_name='project_creator',on_delete = models.SET_NULL)
+    creator = models.ForeignKey(User,null=True,related_name='project_creator',on_delete = models.SET_NULL)
     user = models.ManyToManyField(User,null=True)
     wiki = RichTextField()
-    status = models.BooleanField(default = 1)
+    image = models.FileField(null=True,upload_to='project_media',blank=True)
+    attachment = models.FileField(null=True,upload_to='project_attachment',blank=True)
+    status = models.BooleanField(default = True)
     created_on = models.DateTimeField(auto_now_add=True)
-    launched = models.BooleanField(default=0)
+    launched = models.BooleanField(default=False)
 
     objects = models.Manager()
 
@@ -64,6 +66,14 @@ STATUS_CHOICES = (
     ('closed','Closed'),
 )
 
+class Tag(models.Model):
+    tag_name = models.CharField(max_length = 30)
+
+    def __str__(self):
+            return self.tag_name
+
+
+
 class Bug(models.Model):
     readonly_fields=('heading','description','tags',)
     heading = models.CharField(max_length=500)
@@ -74,9 +84,10 @@ class Bug(models.Model):
     status = models.CharField(max_length=15,choices = STATUS_CHOICES, default = 'New')
     project = models.ForeignKey(Project,related_name='bugs_project',on_delete=models.CASCADE)
     description = RichTextField()
-    tags = TaggableManager()
+    tag = models.ManyToManyField(Tag,null = True)
     assign_to = models.ForeignKey(User,null=True,blank=True,related_name='assign_to_user',on_delete=models.SET_NULL)
     assign_by = models.ForeignKey(User,null=True,blank=True,related_name='assign_by_user',on_delete=models.SET_NULL)
+
 
     objects = models.Manager()
     
@@ -92,16 +103,37 @@ class Bug(models.Model):
             return self.user.first_name
 
     def assigntouser(self):
-        if (self.user):
+        if (self.assign_to):
             return self.assign_to.first_name
 
     def projectname(self):
         return self.project.name
 
+    def projectcreator(self):
+        if self.project.creator:
+            return self.project.creator.id
+
+    def projectuser(self):
+        if (self.project.user):
+            return list(map(lambda x: x.id,self.project.user.all()))
+
+    def projectcreatorname(self):
+        if self.project.creator:
+            return self.project.creator.first_name
+
+    def projectusername(self):
+        if (self.project.user):
+            return list(map(lambda x:x.first_name,self.project.user.all()))
+
+    def tagname(self):
+        if (self.tag):
+            return  list(map(lambda x: x.tag_name,self.tag.all()))  
+
 class Comment(models.Model):
     user = models.ForeignKey(User,null=True,on_delete=models.SET_NULL)
-    bug = models.ForeignKey(Bug,on_delete=models.CASCADE)
+    bug = models.ForeignKey(Bug,on_delete=models.CASCADE,related_name='bugcomments')
     description = RichTextField()
+    parent = models.ForeignKey("self", blank=True, null=True,on_delete=models.CASCADE , related_name="comment_parent")
     status = models.BooleanField(default = 1)
     listed_on  = models.DateTimeField(auto_now_add = True)
 

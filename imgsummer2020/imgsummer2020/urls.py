@@ -16,9 +16,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.urls import include, path
+from django.conf import settings
+from django.conf.urls.static import static
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('djrichtextfield/', include('djrichtextfield.urls')),
     path('BugTracker/', include('BugTracker.urls')),
-]
+] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT) + static(settings.MEDIA_URL_PROJECT, document_root = settings.MEDIA_ROOT_PROJECT) + static(settings.MEDIA_URL_PROJECT_ATTACHMENT, document_root = settings.MEDIA_ROOT_PROJECT_ATTACHMENT)
+

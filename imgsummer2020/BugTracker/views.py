@@ -4,10 +4,10 @@ import json
 from django.urls import reverse
 from django.http import HttpResponse
 from rest_framework import generics,viewsets
-from BugTracker.models import User,Bug,Project,Comment
+from BugTracker.models import User,Bug,Project,Comment,Tag
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from BugTracker.serializers import UserSerializer,ProjectSerializer,BugSerializer,CommentSerializer,AuthSerializer,AuthTokenSerializer
+from BugTracker.serializers import UserSerializer,ProjectSerializer,BugSerializer,CommentSerializer,AuthSerializer,AuthTokenSerializer,TagSerializer
 from rest_framework import permissions
 from BugTracker.permissions import HasProjectPermissions, HasBugPermissions, HasCommentPermissions
 from rest_framework_extensions.mixins import NestedViewSetMixin
@@ -15,10 +15,25 @@ from django.contrib.auth import login
 from knox.views import LoginView as KnoxLoginView
 
 # Create your views here.
+def index(request):
+    return render(request, 'BugTracker/index.html',{})
+
+def room(request, room_name):
+    return render(request, 'BugTracker/room.html', {
+        'room_name': room_name
+    })
+
+
 class UserViewSet(NestedViewSetMixin,viewsets.ModelViewSet):
-    permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = [permissions.IsAuthenticated]
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+
+class TagViewSet(NestedViewSetMixin,viewsets.ModelViewSet):
+    # permission_classes = [permissions.IsAuthenticated]
+    queryset = Tag.objects.all()
+    serializer_class = TagSerializer
 
 class ProjectViewSet(NestedViewSetMixin,viewsets.ModelViewSet):
     # permission_classes = [permissions.IsAuthenticated,HasProjectPermissions]
