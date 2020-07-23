@@ -3,6 +3,7 @@ import axios from 'axios'
 import { tokenConfig } from '../../actions/auth'
 import { connect} from 'react-redux'
 import {store} from '../../index'
+import parse from 'html-react-parser'
 import {createMessage} from '../../actions/messages'
 import { Grid, Segment, ModalContent, Icon,Label ,Button,Card,Image, Embed,Comment,Form,Header, Divider,Popup} from 'semantic-ui-react'
 import { Link, Redirect } from 'react-router-dom'
@@ -566,7 +567,7 @@ class commentlist extends Component{
                   </Card.Description>
                 </Card.Content>
                 <Embed url={this.state.media} wrapped />
-                <Card.Description>{this.state.description}</Card.Description>
+                <Card.Content><p>{parse(`${this.state.description}`)}</p></Card.Content>
                 <Card.Content extra>
                   {
                     this.props.auth.is_staff ||

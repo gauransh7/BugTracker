@@ -3,6 +3,8 @@ import { connect } from 'react-redux';
 import {
   Form, Breadcrumb,Menu
 } from 'semantic-ui-react'
+import CKEditor from '@ckeditor/ckeditor5-react';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import propTypes from 'prop-types'
 import { createProject } from '../../actions/projectAction';
 import { AuthenticateUser, tokenConfig } from '../../actions/auth'
@@ -108,6 +110,10 @@ handleChangeSelect = (e,data) => {
   // console.log(values)
 }
 
+handleEditorChange = (event, editor) => {
+  this.setState({wiki : editor.getData()})
+}
+
   handleSubmit = (e) => {
       e.preventDefault()
       console.log(this.state.user)
@@ -147,79 +153,100 @@ handleChangeSelect = (e,data) => {
     const { name,wiki,image } = this.state
     return (
       <div>
-      <NavBar />
-      <div className="container ui">
-                <Menu borderless className="ui plmenu">
-                  <Menu.Item>
-                    <Breadcrumb>
-                      <Breadcrumb.Section style={{ color: "black" }} as={Link} to='/' >
-                        Projects
-                      </Breadcrumb.Section>
-                      <Breadcrumb.Divider
-                        icon="right chevron"
-                        style={{ color: "darkblue" }}
-                      />
-                      <Breadcrumb.Section style={{ color: "black" }} link>
-                        AddProject
-                      </Breadcrumb.Section>
-                    </Breadcrumb>
-                  </Menu.Item>
-                </Menu>
-              </div>
-      <div className='ui proadddiv'>
-      <div className='container ui segment inverted proadddiv2'>
-      <Form className='addproform' center ui inverted onSubmit={this.handleSubmit} >
-        <Form.Input
-              placeholder='Name'
-              name='name'
-              label='Name : '
-              value = {name}
-              onChange={this.handleChange}
-            />
-            <Form.Input
-              placeholder='Media'
-              name='image'
-              label='Add Media : '
-              id="image"
-              type='file'
-              accept="image/png, image/jpeg"
-              // value = {this.state.image}
-              onChange={this.handleImageChange}
-            />
-            <Form.Input
-              placeholder='ATTACHMENT'
-              name='attachment'
-              label='Add Attachment : '
-              id="attachment"
-              type='file'
-              // accept="image/png, image/jpeg"
-              // value = {this.state.image}
-              onChange={this.handleAttachmentChange}
-            />
-            <Form.Select
-              search
-              multiple
-              placeholder='TeamMembers'
-              name='selectedusers'
-              options = {this.state.users}
-              label = 'Team Members : '
-              value = {this.state.user}
-              name = 'user'
-              onChange = {this.handleChangeSelect}
-            />
-        <Form.TextArea
-              placeholder='wiki'
-              name='wiki'
-              label='Describe Your Project : '
-              value={wiki}
-              onChange={this.handleChange}
-            />
-            <Form.Button style={{'background-color':'white','color':'black'}} content='Submit' />
-      </Form>
+        <NavBar />
+        <div className="container ui">
+          <Menu borderless className="ui plmenu">
+            <Menu.Item>
+              <Breadcrumb>
+                <Breadcrumb.Section style={{ color: "black" }} as={Link} to="/">
+                  Projects
+                </Breadcrumb.Section>
+                <Breadcrumb.Divider
+                  icon="right chevron"
+                  style={{ color: "darkblue" }}
+                />
+                <Breadcrumb.Section style={{ color: "black" }} link>
+                  AddProject
+                </Breadcrumb.Section>
+              </Breadcrumb>
+            </Menu.Item>
+          </Menu>
+        </div>
+        <div className="ui proadddiv">
+          <div style = {{color:'black !important'}} className="container ui segment inverted proadddiv2">
+            <Form
+              className="addproform"
+              center
+              ui
+              inverted
+              onSubmit={this.handleSubmit}
+            >
+              <Form.Input
+                placeholder="Name"
+                name="name"
+                label="Name : "
+                value={name}
+                onChange={this.handleChange}
+              />
+              <Form.Input
+                placeholder="Media"
+                name="image"
+                label="Add Media : "
+                id="image"
+                type="file"
+                accept="image/png, image/jpeg"
+                // value = {this.state.image}
+                onChange={this.handleImageChange}
+              />
+              <Form.Input
+                placeholder="ATTACHMENT"
+                name="attachment"
+                label="Add Attachment : "
+                id="attachment"
+                type="file"
+                // accept="image/png, image/jpeg"
+                // value = {this.state.image}
+                onChange={this.handleAttachmentChange}
+              />
+              <Form.Select
+                search
+                multiple
+                placeholder="TeamMembers"
+                name="selectedusers"
+                options={this.state.users}
+                label="Team Members : "
+                value={this.state.user}
+                name="user"
+                onChange={this.handleChangeSelect}
+              />
+              <Form.Field className = "ckeditor" >
+                <CKEditor
+                
+                 style = {{color:'#000 !important'}}
+                  //placeholder='wiki'
+                  editor={ClassicEditor}
+                  //name='wiki'
+                  //label='Describe Your Project : '
+                  //value={wiki}
+                  onChange={this.handleEditorChange}
+                  config={{
+                    placeholder: "Tell something about your project....",
+                    // toolbar: ['heading', '|', 'bold', 'italic', 'blockQuote', 'link', 'numberedList', 'bulletedList', 'insertTable',
+                    //     'tableColumn', 'tableRow', 'mergeTableCells', '|', 'undo', 'redo','colorButton_colors'],
+                    // colorButton_colors : 'CF5D4E,454545,FFF,CCC,DDD,CCEAEE,66AB16'
+                    //colorButton_enableAutomatic : false
+                  }}
+                />
+              </Form.Field>
+              <Form.Button
+                style={{ "background-color": "white", color: "black" }}
+                content="Submit"
+              />
+            </Form>
+          </div>
+        </div>
       </div>
-      </div>
-      </div>
-    )
+    );
   }
 }
 

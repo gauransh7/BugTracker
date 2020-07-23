@@ -23,7 +23,7 @@ import { Link } from 'react-router-dom';
 
 const options = [
   { key: 'user', text: 'Account', icon: 'user' },
-  { key: 'settings', text: 'Settings', icon: 'settings' },
+  //{ key: 'settings', text: 'Settings', icon: 'settings' },
   { key: 'sign-out', text: 'Sign Out', icon: 'sign out', onMouseDown : () => {this.props.Logout()} },
 ]
 
@@ -37,6 +37,10 @@ class NavBarDesktop extends Component{
       username : this.props.auth.first_name,
       isLoading : true
     };
+    // this.setState = {
+    //   ...this.state,
+    //   username : this.state.username.trim
+    // }
   }
   componentDidMount(){
     // this.setState({
@@ -78,7 +82,7 @@ class NavBarDesktop extends Component{
     <Menu.Item>
     <Dropdown
     trigger= { <span>
-    <Icon name='user' /> {this.props.auth.User ? `${this.props.auth.User.first_name}` : `user`}
+    <Icon name='user' /> {this.props.auth.User ? `${this.props.auth.User.first_name ? this.props.auth.User.first_name.split(" ")[0] : this.props.auth.User.first_name}` : `user`}
   </span>}
     options={[
   { key: 'user', text: 'Account', icon: 'user' },

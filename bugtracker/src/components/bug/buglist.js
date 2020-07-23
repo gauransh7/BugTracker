@@ -78,7 +78,7 @@ class buglist extends Component{
 
     deletebug = (id) => {
       axios.delete(`http://localhost:8000/BugTracker/bugs/${id}/`,tokenConfig(store.getState))
-        .then(resp => { store.dispatch(createMessage({ BugDelete: 'Bug Deleted Without Error'}))
+        .then(resp => { store.dispatch(createMessage({ BugDelete: 'Bug Deleted'}))
         axios.get(`http://localhost:8000/BugTracker/projects/${this.props.match.params.id}/bugs/`,tokenConfig(store.getState))
         .then(res => {
             console.log(Object.keys(res.data).length)

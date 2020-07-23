@@ -3,6 +3,8 @@ import { connect } from 'react-redux';
 import {
   Form, Breadcrumb,Menu,Divider
 } from 'semantic-ui-react'
+import CKEditor from '@ckeditor/ckeditor5-react';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import propTypes from 'prop-types'
 import { AuthenticateUser, tokenConfig } from '../../actions/auth'
 import NavBar from '../navbar'
@@ -103,6 +105,9 @@ handleImageChange = (e) => {
   })
 };
 
+handleEditorChange = (event, editor) => {
+  this.setState({description : editor.getData()})
+}
 
 // handleChangeSelect = (e,data) => {
 //   console.log(this.props.auth.User.id)
@@ -285,13 +290,33 @@ handleImageChange = (e) => {
               name = 'tag'
               onChange = {this.handleChangeSelect}
             />
-        <Form.TextArea
+        {/* <Form.TextArea
               placeholder='Description'
               name='description'
               label='Describe Your Project : '
               value={description}
               onChange={this.handleChange}
-            />
+            /> */}
+        <Form.Field className = "ckeditor" >
+                <CKEditor
+                
+                 style = {{color:'#000 !important'}}
+                  //placeholder='wiki'
+                  editor={ClassicEditor}
+                  //name='wiki'
+                  //label='Describe Your Project : '
+                  //value={wiki}
+                  onChange={this.handleEditorChange}
+                  config={{
+                    placeholder: "Explain the bug....",
+                    // toolbar: ['heading', '|', 'bold', 'italic', 'blockQuote', 'link', 'numberedList', 'bulletedList', 'insertTable',
+                    //     'tableColumn', 'tableRow', 'mergeTableCells', '|', 'undo', 'redo','colorButton_colors'],
+                    // colorButton_colors : 'CF5D4E,454545,FFF,CCC,DDD,CCEAEE,66AB16'
+                    //colorButton_enableAutomatic : false
+                  }}
+                />
+              </Form.Field>
+
 
             <Form.Button style={{'background-color':'white','color':'black'}} content='Submit' />
       </Form>

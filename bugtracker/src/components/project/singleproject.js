@@ -8,6 +8,7 @@ import { Link, Redirect } from 'react-router-dom'
 import NavBar  from '../navbar'
 import { Date} from 'prismic-reactjs';
 import Moment from 'moment'
+import parse from 'html-react-parser';
 import { deleteProject , getProjects} from '../../actions/projectAction'
 import { AuthenticateUser } from '../../actions/auth'
 // import { returnErrors } from '../../actions/messages'
@@ -121,8 +122,8 @@ class singleproject extends Component{
 
 
 
-              <Card fluid style={{'font-variant': 'all-petite-caps',
-    'font-size': 'x-large'}}>
+              <Card fluid style={{'font': '-webkit-mini-control',
+    'font-size': 'medium'}}>
                 <Card.Content>
                   {/* <Button
                     as={Link}
@@ -167,12 +168,12 @@ class singleproject extends Component{
                     <strong style={{'color':'chocolate'}}>TEAM MEMBERS : </strong><span><Feed style={{'font-size':'large'}}>{teammembers}</Feed></span>
                   </Card.Description>
                 </Card.Content>
-                <Embed
+                {/* <Embed
                   url={this.state.attachment}
                   wrapped
-                />
+                /> */}
                 <Card.Content>
-                <p>{this.state.wiki}</p>
+                <p>{parse(`${this.state.wiki}`)}</p>
                 </Card.Content>
                 <Card.Content extra>
                   <Button className='delbuttonsp' inverted floated="right" color="red" onClick={this.props.deleteProject.bind(this,this.state.id)} >

@@ -3,6 +3,8 @@ import { connect } from 'react-redux';
 import {
   Form, Breadcrumb,Menu,Checkbox,Image, Button
 } from 'semantic-ui-react'
+import CKEditor from '@ckeditor/ckeditor5-react';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import propTypes from 'prop-types'
 import { createProject } from '../../actions/projectAction';
 import { AuthenticateUser, tokenConfig } from '../../actions/auth'
@@ -102,6 +104,12 @@ static propTypes = {
 //   }
 
 handleChange = (e, { name, value }) => this.setState({ [name]: value })
+
+handleEditorChange = (event, editor) => {
+  this.setState({wiki : editor.getData()})
+}
+
+
 
 updatestatus = (e) => this.setState({status:!this.state.status})
 updatelaunched = (e) => this.setState({launched:!this.state.launched})
@@ -300,13 +308,33 @@ deleteimage = (e) => {
                 name="user"
                 onChange={this.handleChangeSelect}
               />
-              <Form.TextArea
+              {/* <Form.TextArea
                 placeholder="wiki"
                 name="wiki"
                 label="Describe Your Project : "
                 value={wiki}
                 onChange={this.handleChange}
-              />
+              /> */}
+              <Form.Field className = "ckeditor" >
+              
+                <CKEditor
+                label = "Change project description"
+                 style = {{color:'#000 !important'}}
+                  //placeholder='wiki'
+                  editor={ClassicEditor}
+                  //name='wiki'
+                  //label='Describe Your Project : '
+                  data={wiki}
+                  onChange={this.handleEditorChange}
+                  config={{
+                    //placeholder: "Tell something about your project....",
+                    // toolbar: ['heading', '|', 'bold', 'italic', 'blockQuote', 'link', 'numberedList', 'bulletedList', 'insertTable',
+                    //     'tableColumn', 'tableRow', 'mergeTableCells', '|', 'undo', 'redo','colorButton_colors'],
+                    // colorButton_colors : 'CF5D4E,454545,FFF,CCC,DDD,CCEAEE,66AB16'
+                    //colorButton_enableAutomatic : false
+                  }}
+                />
+                </Form.Field>
               <Form.Field
                 control={Checkbox}
                 label={<label>status : </label>}
