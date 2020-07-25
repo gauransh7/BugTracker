@@ -16,6 +16,7 @@ cryptography==2.9.2
 daphne==2.5.0
 Django==3.0.5
 django-cors-headers==3.2.1
+django-environ==0.4.5
 django-rest-knox==4.1.0
 django-richtextfield==1.5.0
 django-taggit==1.2.0
@@ -44,6 +45,7 @@ pylint==2.5.2
 pylint-django==2.0.15
 pylint-plugin-utils==0.6
 pyOpenSSL==19.1.0
+python-decouple==3.3
 pytz==2020.1
 requests==2.23.0
 service-identity==18.1.0
