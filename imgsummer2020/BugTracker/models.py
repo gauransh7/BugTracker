@@ -23,6 +23,12 @@ class User(AbstractUser):
     def __str__(self):
         return str(self.enr_no)
 
+    def nameof(self):
+        return str(self.username)
+
+    def countbugs(self):
+        return len(list(self.listed_by_user.all()))
+
 class Project(models.Model):
     name = models.CharField(max_length=50)
     creator = models.ForeignKey(User,null=True,related_name='project_creator',on_delete = models.SET_NULL)

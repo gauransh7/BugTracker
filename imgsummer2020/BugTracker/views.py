@@ -13,6 +13,10 @@ from BugTracker.permissions import HasProjectPermissions, HasBugPermissions, Has
 from rest_framework_extensions.mixins import NestedViewSetMixin
 from django.contrib.auth import login
 from knox.views import LoginView as KnoxLoginView
+from rest_framework import serializers
+from django.core.mail import send_mail
+from django.conf import settings
+from decouple import config
 
 # Create your views here.
 def index(request):
@@ -41,12 +45,34 @@ class ProjectViewSet(NestedViewSetMixin,viewsets.ModelViewSet):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
 
+    def create(self,request):
+        send_mail(
+            'New Project for testing',
+            request.data['name'] + ' is up for testing. \nContact the maintainers for any doubt. \n' + User.objects.get(pk=request.data['creator']).first_name,
+            settings.EMAIL_HOST_USER,
+            list(map(lambda x: x.email,User.objects.all())),
+            fail_silently=False
+        )
+        return super().create(request)
+
 
 class BugViewSet(NestedViewSetMixin,viewsets.ModelViewSet):
     # permission_classes = [permissions.IsAuthenticated,HasBugPermissions]
     # permission_classes = [permissions.AllowAny]
     queryset = Bug.objects.all()
     serializer_class = BugSerializer
+    def create(self,request):
+        listuser = list(map(lambda x:x.id,Project.objects.get(pk=request.data['project']).user.all()))
+        listuser.append(Project.objects.get(pk=request.data['project']).creator.id)
+        send_mail(
+            'New bug reported',
+            User.objects.get(pk=request.data['user']).first_name + ' added a New bug to ' + Project.objects.get(pk=request.data['project']).name,
+            settings.EMAIL_HOST_USER,
+            list(map(lambda x: x.email,User.objects.filter(pk__in = listuser))),
+            fail_silently=False
+        )
+        return super().create(request)
+
 
 class CommentViewSet(NestedViewSetMixin,viewsets.ModelViewSet):
     # permission_classes = [permissions.IsAuthenticated,HasCommentPermissions]
@@ -60,8 +86,8 @@ class AuthView(APIView):
         code = request.GET.get('code', '')
         class Auth:
             def __init__(self,code):
-                self.client_id = '9M2ddc3zJkHFly9xXBuYD8aQjtsNGNqxIDiSADNv'
-                self.client_secret = 'LU0uRFCz8T7Yv4JF4irTcxBxaYdRamsCTl2SVbL19yxFNEtBy79bp4rtYPB3nZTo8PSHSzUpuhEvb7Ecm9bB9XLXCq11CS8jccC95WSsGwYXNUmNWrlNhhz2KAKhXekR'
+                self.client_id = config('CLIENT_ID')
+                self.client_secret = config('CLIENT_SECRET')
                 self.grant_type = 'authorization_code'
                 self.code = code
                 self.redirect_url =  'http://localhost:3000/#/getauth/'

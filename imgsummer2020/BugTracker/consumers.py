@@ -42,8 +42,10 @@ class ChatConsumer(WebsocketConsumer):
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
         parentid = text_data_json['parent']
-
-        comment = self.bug.bugcomments.create(user = self.user, description = message,parent = Comment.objects.get(id =parentid))
+        if(parentid != 0):
+            comment = self.bug.bugcomments.create(user = self.user, description = message,parent = Comment.objects.get(id =parentid))
+        else:
+            comment = self.bug.bugcomments.create(user = self.user, description = message)
         serializer = CommentSerializer(comment)
 
         async_to_sync(self.channel_layer.group_send)(

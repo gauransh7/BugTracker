@@ -6,6 +6,7 @@ from taggit_serializer.serializers import (TagListSerializerField,
                                            TaggitSerializer)
 
 class UserSerializer(serializers.ModelSerializer):
+    countbugs = serializers.ReadOnlyField() 
     class Meta:
         model = User
         fields = '__all__' 
@@ -33,9 +34,9 @@ class BugSerializer(serializers.ModelSerializer):
     projectcreatorname = serializers.ReadOnlyField()
     projectusername = serializers.ReadOnlyField()
     def update(self, instance, validated_data):
-        validated_data.pop('heading', None) 
+        validated_data.pop('heading', None)  # prevent heading from being updated
         validated_data.pop('description', None) 
-        validated_data.pop('user', None)  # prevent heading from being updated
+        validated_data.pop('user', None) 
         return super().update(instance, validated_data)
 
     class Meta:
