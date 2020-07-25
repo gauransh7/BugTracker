@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
 import {
-  Form, Breadcrumb,Menu,Divider
+  Form, Breadcrumb,Menu,Divider,Segment,Dimmer,Loader
 } from 'semantic-ui-react'
 import CKEditor from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
@@ -61,7 +61,8 @@ componentDidMount(){
 
 
 static propTypes = {
-  AuthenticateUser : propTypes.func.isRequired
+  AuthenticateUser : propTypes.func.isRequired,
+  createMessage : propTypes.func.isRequired
 }
 
   state = {
@@ -73,7 +74,8 @@ static propTypes = {
       user :  this.props.auth.id ? this.props.auth.id : null,
       media:null,
       project : '',
-      addtag : ''
+      addtag : '',
+      mail : false
   }
 
 //   handleChange = (e, { value }) => this.setState({ value })
@@ -153,7 +155,9 @@ handleEditorChange = (event, editor) => {
       this.componentDidMount()
     }
     else{
-      alert('type something')
+      store.dispatch(
+        createMessage({ EMPTYCOMMENT: "TYPE SOMETHING BEFORE SUBMITTING !" })
+      );
     }
   }
 
@@ -169,172 +173,206 @@ handleEditorChange = (event, editor) => {
       // }
     //   const { name, wiki, user ,image,creator } = this.state
       // const project = { name, wiki, user,image ,creator : parseInt(creator) }
-      let formdata = new FormData()
-      formdata.append('heading',this.state.heading)
-      formdata.append('description',this.state.description)
-      if (this.state.media !== null){
-        formdata.append('media',this.state.media)
-      }
-      formdata.append('user',parseInt(this.props.auth.User.id))
-      formdata.append('status','new')
-      formdata.append('project',this.props.match.params.id)
-      for (let i=0;i<this.state.tag.length;i++){
-        formdata.append('tag',this.state.tag[i])
+      if(this.state.heading && this.state.description && this.state.tag.length!==0){
+        this.setState({
+          ...this.state,
+          mail : true
+        })
+        let formdata = new FormData()
+        formdata.append('heading',this.state.heading)
+        formdata.append('description',this.state.description)
+        if (this.state.media !== null){
+          formdata.append('media',this.state.media)
+        }
+        formdata.append('user',parseInt(this.props.auth.User.id))
+        formdata.append('status','new')
+        formdata.append('project',this.props.match.params.id)
+        for (let i=0;i<this.state.tag.length;i++){
+          formdata.append('tag',this.state.tag[i])
+        }
+        console.log(formdata)
+        // console.log(typeof(this.array(this.state.tags)))
+        // Get token from state
+      const token = store.getState().auth.token;
+        
+      // Headers
+      const config = {
+        headers: {
+          //  'Content-Type': 'application/json'
+        },
+      };
+    
+      // If token, add to headers config
+      if (token) {
+        config.headers['Authorization'] = `Token ${token}`;
+      //    config.headers['Accept'] = 'multipart/form-data'
       }
       console.log(formdata)
-      // console.log(typeof(this.array(this.state.tags)))
-      // Get token from state
-     const token = store.getState().auth.token;
-      
-     // Headers
-     const config = {
-       headers: {
-        //  'Content-Type': 'application/json'
-       },
-     };
-   
-     // If token, add to headers config
-     if (token) {
-       config.headers['Authorization'] = `Token ${token}`;
-    //    config.headers['Accept'] = 'multipart/form-data'
-     }
-     console.log(formdata)
-      axios.post(`http://localhost:8000/BugTracker/bugs/`,formdata,config)
-      .then(res =>{
-          store.dispatch(createMessage({ BugAdd: 'Bug Added'}));
-          window.location.href=`http://localhost:3000/project/${this.props.match.params.id}/bugs`
-      }
-      )
-      .catch(err => {
-          console.log(err.response.data)
-          const error = {
-              msg : err.response.data,
-              status : err.response.status
-          }
-          store.dispatch(
-              {
-                  type : 'GET_ERRORS',
-                  payload : error
-              }
-          )
-      })
-      // console.log(project)
-      this.setState(
-        {      heading : '',
-        description : '',
-        status : 'new',
-        user :  this.props.auth.id ? this.props.auth.id : null,
-        media:null,
-        project : ''
+        axios.post(`http://localhost:8000/BugTracker/bugs/`,formdata,config)
+        .then(res =>{
+            store.dispatch(createMessage({ BugAdd: 'Bug Added'}));
+            window.location.href=`http://localhost:3000/project/${this.props.match.params.id}/bugs`
+        }
+        )
+        .catch(err => {
+            console.log(err.response.data)
+            const error = {
+                msg : err.response.data,
+                status : err.response.status
+            }
+            store.dispatch(
+                {
+                    type : 'GET_ERRORS',
+                    payload : error
+                }
+            )
         })
+        // console.log(project)
+        this.setState(
+          {      heading : '',
+          description : '',
+          status : 'new',
+          user :  this.props.auth.id ? this.props.auth.id : null,
+          media:null,
+          // project : ''
+          })
+        }
+        else{
+          if(!this.state.heading){
+            store.dispatch(
+              createMessage({ EMPTYCOMMENT: "TYPE SOMETHING BEFORE SUBMITTING !" })
+            );
+          }
+          if(this.state.description){
+            store.dispatch(
+              createMessage({ EMPTYCOMMENT: "TYPE SOMETHING BEFORE SUBMITTING !" })
+            );
+          }
+          if(this.state.tag.length==0){
+            store.dispatch(
+              createMessage({ EMPTYTAG: "ADD a tag ! if you can't find one add a relatable tag from the form below !" })
+            );
+          }
+        }
   }
 
   render() {
     const { heading,description,media ,tag} = this.state
-    return (
-      <div>
-      <NavBar />
-      <div className="container ui">
-                <Menu borderless className="ui plmenu">
-                  <Menu.Item>
-                    <Breadcrumb>
-                      <Breadcrumb.Section style={{ color: "black" }} as={Link} to='/' >
-                        Projects
-                      </Breadcrumb.Section>
-                      <Breadcrumb.Divider
-                        icon="right chevron"
-                        style={{ color: "darkblue" }}
-                      />
-                      <Breadcrumb.Section style={{ color: "black" }} as={Link} to={`/project/${this.props.match.params.id}`}>
-                        {this.state.project}
-                      </Breadcrumb.Section>
-                      <Breadcrumb.Divider
-                        icon="right chevron"
-                        style={{ color: "darkblue" }}
-                      />
-                      <Breadcrumb.Section style={{ color: "black" }} link>
-                        Add Bug
-                      </Breadcrumb.Section>
-                    </Breadcrumb>
-                  </Menu.Item>
-                </Menu>
-              </div>
-      <div className='ui proadddiv'>
-      <div className='container ui segment inverted proadddiv2'>
-      <Form className='addproform' center ui inverted onSubmit={this.handleSubmit} >
-        <Form.Input
-              placeholder='Heading'
-              name='heading'
-              label='Heading : '
-              value = {heading}
-              onChange={this.handleChange}
-            />
-            <Form.Input
-              placeholder='Media'
-              name='media'
-              label='Add Media : '
-              id="media"
-              type='file'
-              accept="image/png, image/jpeg, image/jfif, video/mp4, video/webm, video/mov"
-              // value = {this.state.image}
-              onChange={this.handleImageChange}
-            />
-            <Form.Select
-              search
-              multiple
-              placeholder='Tags'
-              name='tag'
-              options = {this.state.tags}
-              label = 'Tags : '
-              value = {this.state.tag}
-              name = 'tag'
-              onChange = {this.handleChangeSelect}
-            />
-        {/* <Form.TextArea
-              placeholder='Description'
-              name='description'
-              label='Describe Your Project : '
-              value={description}
-              onChange={this.handleChange}
-            /> */}
-        <Form.Field className = "ckeditor" >
-                <CKEditor
-                
-                 style = {{color:'#000 !important'}}
-                  //placeholder='wiki'
-                  editor={ClassicEditor}
-                  //name='wiki'
-                  //label='Describe Your Project : '
-                  //value={wiki}
-                  onChange={this.handleEditorChange}
-                  config={{
-                    placeholder: "Explain the bug....",
-                    // toolbar: ['heading', '|', 'bold', 'italic', 'blockQuote', 'link', 'numberedList', 'bulletedList', 'insertTable',
-                    //     'tableColumn', 'tableRow', 'mergeTableCells', '|', 'undo', 'redo','colorButton_colors'],
-                    // colorButton_colors : 'CF5D4E,454545,FFF,CCC,DDD,CCEAEE,66AB16'
-                    //colorButton_enableAutomatic : false
-                  }}
-                />
-              </Form.Field>
+    if(!this.state.mail){
+      return (
+        <div>
+        <NavBar />
+        <div className="container ui">
+                  <Menu borderless className="ui plmenu">
+                    <Menu.Item>
+                      <Breadcrumb>
+                        <Breadcrumb.Section style={{ color: "black" }} as={Link} to='/' >
+                          Projects
+                        </Breadcrumb.Section>
+                        <Breadcrumb.Divider
+                          icon="right chevron"
+                          style={{ color: "darkblue" }}
+                        />
+                        <Breadcrumb.Section style={{ color: "black" }} as={Link} to={`/project/${this.props.match.params.id}`}>
+                          {this.state.project}
+                        </Breadcrumb.Section>
+                        <Breadcrumb.Divider
+                          icon="right chevron"
+                          style={{ color: "darkblue" }}
+                        />
+                        <Breadcrumb.Section style={{ color: "black" }} link>
+                          Add Bug
+                        </Breadcrumb.Section>
+                      </Breadcrumb>
+                    </Menu.Item>
+                  </Menu>
+                </div>
+        <div className='ui proadddiv'>
+        <div className='container ui segment inverted proadddiv2'>
+        <Form className='addproform' center ui inverted onSubmit={this.handleSubmit} >
+          <Form.Input
+                placeholder='Heading'
+                name='heading'
+                label='Heading : '
+                value = {heading}
+                onChange={this.handleChange}
+              />
+              <Form.Input
+                placeholder='Media'
+                name='media'
+                label='Add Media : '
+                id="media"
+                type='file'
+                accept="image/png, image/jpeg, image/jfif, video/mp4, video/webm, video/mov"
+                // value = {this.state.image}
+                onChange={this.handleImageChange}
+              />
+              <Form.Select
+                search
+                multiple
+                placeholder='Tags'
+                name='tag'
+                options = {this.state.tags}
+                label = 'Tags : '
+                value = {this.state.tag}
+                name = 'tag'
+                onChange = {this.handleChangeSelect}
+              />
+          {/* <Form.TextArea
+                placeholder='Description'
+                name='description'
+                label='Describe Your Project : '
+                value={description}
+                onChange={this.handleChange}
+              /> */}
+          <Form.Field className = "ckeditor" >
+                  <CKEditor
+                  
+                  style = {{color:'#000 !important'}}
+                    //placeholder='wiki'
+                    editor={ClassicEditor}
+                    //name='wiki'
+                    //label='Describe Your Project : '
+                    //value={wiki}
+                    onChange={this.handleEditorChange}
+                    config={{
+                      placeholder: "Explain the bug....",
+                      // toolbar: ['heading', '|', 'bold', 'italic', 'blockQuote', 'link', 'numberedList', 'bulletedList', 'insertTable',
+                      //     'tableColumn', 'tableRow', 'mergeTableCells', '|', 'undo', 'redo','colorButton_colors'],
+                      // colorButton_colors : 'CF5D4E,454545,FFF,CCC,DDD,CCEAEE,66AB16'
+                      //colorButton_enableAutomatic : false
+                    }}
+                  />
+                </Form.Field>
 
 
-            <Form.Button style={{'background-color':'white','color':'black'}} content='Submit' />
-      </Form>
-      <Divider />
-      <Form onSubmit={this.handleSubmitTag}>
-      <Form.TextArea
-              placeholder='Tags you want to add to above list.'
-              name='addtag'
-              label='Add tags separated by spaces : '
-              value={this.state.addtag}
-              onChange={this.handleChange}
-            />
-            <Form.Button style={{'background-color':'white','color':'black'}} content='Add Tag' />
-            </Form>
-      </div>
-      </div>
-      </div>
-    )
+              <Form.Button style={{'background-color':'white','color':'black'}} content='Submit' />
+        </Form>
+        <Divider />
+        <Form onSubmit={this.handleSubmitTag}>
+        <Form.TextArea
+                placeholder='Tags you want to add to above list.'
+                name='addtag'
+                label='Add tags separated by spaces : '
+                value={this.state.addtag}
+                onChange={this.handleChange}
+              />
+              <Form.Button style={{'background-color':'white','color':'black'}} content='Add Tag' />
+              </Form>
+        </div>
+        </div>
+        </div>
+      )
+                }
+                else{
+                  return (
+                    <Segment className='fullscreen' style={{'background-color':'black','height':'-webkit-fill-available','width':'auto'}}>
+                            <Dimmer className='fullscreen' active>
+                              <Loader className='center' indeterminate>SENDING A MAIL TO <span> {this.state.project} </span>MAINTAINERS TO TEST  !</Loader>
+                            </Dimmer>
+                          </Segment>
+                  )
+                }
   }
 }
 
@@ -346,4 +384,4 @@ const mapStateToProps = (state) => {
 }
 
 
-export default connect(mapStateToProps, {  AuthenticateUser })(AddBug)
+export default connect(mapStateToProps, {  AuthenticateUser ,createMessage})(AddBug)

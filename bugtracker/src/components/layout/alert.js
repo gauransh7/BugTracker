@@ -47,6 +47,18 @@ export class Alert extends Component{
             if(messages.EMPTYCOMMENT){
                 alert.error(messages.EMPTYCOMMENT)
             }
+            if(messages.EMPTYTAG){
+                alert.error(messages.EMPTYTAG)
+            }
+            if(messages.EMPTYUSER){
+                alert.error(messages.EMPTYUSER)
+            }
+            if(messages.EMPTYNAME){
+                alert.error(messages.EMPTYNAME)
+            }
+            if(messages.EMPTYWIKI){
+                alert.error(messages.EMPTYWIKI)
+            }
         }
     }
 

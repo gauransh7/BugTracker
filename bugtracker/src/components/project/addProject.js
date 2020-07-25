@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
 import {
-  Form, Breadcrumb,Menu
+  Form, Breadcrumb,Menu,Segment,Dimmer,Loader
 } from 'semantic-ui-react'
 import CKEditor from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
@@ -13,6 +13,7 @@ import axios from 'axios'
 import { Link, Redirect } from 'react-router-dom'
 import {store} from '../../index'
 import '../../css/addproject.css'
+import { createMessage} from '../../actions/messages'
 
 // const options = [
 //   { key: 'm', text: 'Male', value: 'male' },
@@ -45,7 +46,8 @@ componentDidMount(){
 
 static propTypes = {
   createProject : propTypes.func.isRequired,
-  AuthenticateUser : propTypes.func.isRequired
+  AuthenticateUser : propTypes.func.isRequired,
+  createMessage : propTypes.func.isRequired
 }
 
   state = {
@@ -55,7 +57,8 @@ static propTypes = {
       user : [],
       image:null,
       attachment : null,
-      creator : this.props.auth.id ? this.props.auth.id : null
+      creator : this.props.auth.id ? this.props.auth.id : null,
+      mail : false
   }
 
 //   handleChange = (e, { value }) => this.setState({ value })
@@ -119,38 +122,59 @@ handleEditorChange = (event, editor) => {
       console.log(this.state.user)
       const { name, wiki, user ,image,creator } = this.state
       // const project = { name, wiki, user,image ,creator : parseInt(creator) }
-      let formdata = new FormData()
-      formdata.append('name',this.state.name)
-      formdata.append('wiki',this.state.wiki)
-      if (this.state.image)
-      {
-         formdata.append('image',this.state.image) 
+      if(this.state.name && this.state.wiki && this.state.user.length!==0){
+        this.setState({mail : true})
+        let formdata = new FormData()
+        formdata.append('name',this.state.name)
+        formdata.append('wiki',this.state.wiki)
+        if (this.state.image)
+        {
+          formdata.append('image',this.state.image) 
+        }
+        if (this.state.attachment)
+        {
+          formdata.append('attachment',this.state.attachment) 
+        }
+        formdata.append('creator',parseInt(this.props.auth.User.id))
+        formdata.append('status',true)
+        formdata.append('launched',false)
+        for (let i=0;i<this.state.user.length;i++){
+          formdata.append('user',this.state.user[i])
+        }
+        console.log(this.state.creator)
+        this.props.createProject(formdata)
+        // console.log(project)
+        this.setState(
+          {name : '',
+          wiki : '',
+          user : [],
+          image: null,
+          creator : this.props.auth.User.id
+          })
+        }
+        else{
+          if(this.state.user.length==0){
+            store.dispatch(
+              createMessage({ EMPTYUSER: "ADD TEAM MEMBERS ! Mentors are also allowed as Team members" })
+            );
+          }
+          if(!this.state.name){
+            store.dispatch(
+              createMessage({ EMPTYNAME: "Give a name to your project !" })
+            );
+          }
+          if(!this.state.wiki){
+          store.dispatch(
+            createMessage({ EMPTYWIKI: "Describe your project !" })
+          );
+        }
       }
-      if (this.state.attachment)
-      {
-         formdata.append('attachment',this.state.attachment) 
-      }
-      formdata.append('creator',parseInt(this.props.auth.User.id))
-      formdata.append('status',true)
-      formdata.append('launched',false)
-      for (let i=0;i<this.state.user.length;i++){
-        formdata.append('user',this.state.user[i])
-      }
-      console.log(this.state.creator)
-      this.props.createProject(formdata)
-      // console.log(project)
-      this.setState(
-        {name : '',
-        wiki : '',
-        user : [],
-        image: null,
-        creator : this.props.auth.User.id
-        })
   }
 
   render() {
     console.log(this.state)
     const { name,wiki,image } = this.state
+    if(!this.state.mail){
     return (
       <div>
         <NavBar />
@@ -248,6 +272,16 @@ handleEditorChange = (event, editor) => {
       </div>
     );
   }
+else{
+  return (
+    <Segment className='fullscreen' style={{'background-color':'black','height':'-webkit-fill-available','width':'auto'}}>
+            <Dimmer className='fullscreen' active>
+              <Loader className='center' indeterminate>SENDING A MAIL TO IMG MAINTAINERS TO TEST {this.state.name} !</Loader>
+            </Dimmer>
+          </Segment>
+  )
+}
+}
 }
 
 const mapStateToProps = (state) => {
@@ -257,4 +291,4 @@ const mapStateToProps = (state) => {
 }
 
 
-export default connect(mapStateToProps, { createProject, AuthenticateUser })(AddProject)
+export default connect(mapStateToProps, { createProject,createMessage, AuthenticateUser })(AddProject)
