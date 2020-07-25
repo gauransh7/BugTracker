@@ -116,7 +116,21 @@ export const LoadUser = () => (dispatch, getState) => {
 
 
      
-     
+      export const getUsers = () => (dispatch,getState) =>{
+        axios.get('http://localhost:8000/BugTracker/users/',tokenConfig(getState))
+            .then(res => {
+                dispatch(
+                    {
+                        type: 'GET_USERS',
+                        payload : res.data
+                    }
+                )
+                
+            }
+    
+            )
+            .catch(err => console.log(err))
+    };  
      
      
      

@@ -6,6 +6,7 @@ import { Table, Tab ,Segment,Dimmer,Loader, Icon,Checkbox} from 'semantic-ui-rea
 import NavBar from './navbar';
 import { createMessage } from '../actions/messages';
 import {connect} from 'react-redux'
+import {Link} from 'react-router-dom'
 
 class admin extends Component {
     constructor(props){
@@ -70,7 +71,7 @@ class admin extends Component {
             console.log(user.first_name)
             return <Table.Row key={user.id}>
                 <Table.Cell><div>{this.state.users.indexOf(user)+1}</div></Table.Cell>
-                <Table.Cell><div>{user.first_name}</div></Table.Cell>
+                <Table.Cell><div><Link style={{'color':"black"}} to={`/mypage/${user.id}/`}>{user.first_name}</Link></div></Table.Cell>
                 <Table.Cell >{user.is_active ? <Checkbox onClick={this.changebool(user.id,'is_active')} toggle checked/> : <Checkbox onClick={this.changebool(user.id,'is_active')} toggle />}</Table.Cell>
                 <Table.Cell >{user.is_staff ? <Checkbox onClick={this.changebool(user.id,'is_staff')} toggle checked/> : <Checkbox name='is_staff' onClick={this.changebool(user.id,'is_staff')} toggle />}</Table.Cell>
                 <Table.Cell>{user.cur_yr}</Table.Cell>

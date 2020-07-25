@@ -204,7 +204,7 @@ handleEditorChange = (event, editor) => {
                 label="Add Attachment : "
                 id="attachment"
                 type="file"
-                // accept="image/png, image/jpeg"
+                accept="image/png, image/jpeg, image/jfif, video/mp4, video/webm, video/mov"
                 // value = {this.state.image}
                 onChange={this.handleAttachmentChange}
               />

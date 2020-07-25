@@ -2,7 +2,8 @@ const initstate = {
     token : localStorage.getItem('token'),
     isAuthenticated : false,
     isLoading : false,
-    User : null
+    User : null,
+    users : []
 }
 
 const authReducer = (state=initstate,action) =>{
@@ -27,6 +28,12 @@ const authReducer = (state=initstate,action) =>{
                 ...action.payload,
                 is_Authenticated:true,
                 is_Loading:false
+            }
+
+        case 'GET_USERS':
+            return {
+                ...state,
+                users : action.payload
             }
 
         case 'USER_AUTHENTICATED':

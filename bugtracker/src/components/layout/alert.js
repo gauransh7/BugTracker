@@ -44,6 +44,9 @@ export class Alert extends Component{
             if(messages.BUGASSIGNED){
                 alert.success(messages.BUGASSIGNED)
             }
+            if(messages.EMPTYCOMMENT){
+                alert.error(messages.EMPTYCOMMENT)
+            }
         }
     }
 

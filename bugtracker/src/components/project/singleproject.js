@@ -3,6 +3,7 @@ import axios from 'axios'
 import { tokenConfig } from '../../actions/auth'
 import { connect} from 'react-redux'
 import {store} from '../../index'
+import { getUsers } from '../../actions/auth'
 import { Grid,Icon, Button,Menu,Breadcrumb,Card,Image, Feed, Segment, Embed} from 'semantic-ui-react'
 import { Link, Redirect } from 'react-router-dom'
 import NavBar  from '../navbar'
@@ -26,13 +27,17 @@ const rightItems = [
 
 class singleproject extends Component{ 
 
-
+  constructor(props) {
+    super(props);
+    //this.state = {};
+  }
 
     static propTypes = {
         tokenConfig : propTypes.func.isRequired,
         deleteProject : propTypes.func.isRequired,
         AuthenticateUser: propTypes.func.isRequired,
-        getProjects : propTypes.func.isRequired
+        getProjects : propTypes.func.isRequired,
+      getUsers : propTypes.func.isRequired
     }
 
 
@@ -41,8 +46,10 @@ class singleproject extends Component{
     }
 
     componentDidMount(){
+      this.props.getUsers()
       this.props.AuthenticateUser()
       this.props.getProjects()
+
       console.log(this.state)
         console.log(this.props);
         const id =  this.props.match.params.id;
@@ -74,6 +81,7 @@ class singleproject extends Component{
       const { projects } = this.props
       console.log(projects)
       console.log(this.props.match.params.id)
+      console.log(this.props.auth.users.find((use) => use.first_name === this.state.createdbyname) ? this.props.auth.users.find((use) => use.first_name === this.state.createdbyname).image : '')
       if(projects && this.props.match.params.id){
         const show = projects.filter(proj => proj.id === parseInt(this.props.match.params.id)).length ? true : false
         console.log(!show)
@@ -85,8 +93,9 @@ class singleproject extends Component{
         const date = Date(this.state.created_on);
         const formattedDate = Moment(date).format("LL");
         const teammembers = this.state.usernames ? this.state.usernames.map(user => {
+          console.log(this.props.auth.users.find((dum) => dum.first_name===user))
           return <Feed.Event>
-            <Feed.Label icon='user' />
+            {this.props.auth.users.find((dum) => dum.first_name===user).image ? <Feed.Label> <img className='circular' src={this.props.auth.users.find((dum) =>dum.first_name===user).image} /></Feed.Label> : <Feed.Label icon='user' />}
             <Feed.Content>
               <Feed.Summary>
                 {user}
@@ -124,7 +133,7 @@ class singleproject extends Component{
 
               <Card fluid style={{'font': '-webkit-mini-control',
     'font-size': 'medium'}}>
-                <Card.Content>
+                <Card.Content style={{'line-height' : '2em'}}>
                   {/* <Button
                     as={Link}
                     to={`/project/${this.props.match.params.id}/addbug/`}
@@ -156,7 +165,7 @@ class singleproject extends Component{
                     <strong style={{'color':'chocolate'}}>CREATED BY : </strong><span>
                     <Feed  style={{'font-size':'large'}}> 
                     <Feed.Event >           
-                    <Feed.Label icon='user' />
+                    {this.props.auth.users.find((use) => use.first_name === this.state.createdbyname) ? <Feed.Label> <img className='circular' src={this.props.auth.users.find((use) => use.first_name === this.state.createdbyname).image} /></Feed.Label> : <Feed.Label icon='user' />}
             <Feed.Content>
               <Feed.Summary>
                 {this.state.createdbyname}
@@ -168,10 +177,15 @@ class singleproject extends Component{
                     <strong style={{'color':'chocolate'}}>TEAM MEMBERS : </strong><span><Feed style={{'font-size':'large'}}>{teammembers}</Feed></span>
                   </Card.Description>
                 </Card.Content>
-                {/* <Embed
-                  url={this.state.attachment}
-                  wrapped
-                /> */}
+                {this.state.attachment ? (
+              this.state.attachment.endsWith("webm") ||
+              this.state.attachment.endsWith("mp4") ||
+              this.state.attachment.endsWith("mov") ? (
+                <Embed url={this.state.attachment} wrapped />
+              ) : (
+                <Image src={this.state.attachment} wrapped />
+              )
+            ) : null}
                 <Card.Content>
                 <p>{parse(`${this.state.wiki}`)}</p>
                 </Card.Content>
@@ -226,8 +240,9 @@ class singleproject extends Component{
 
 const mapStateToProps = (state) => {
   return {
-    projects : state.project.posts
+    projects : state.project.posts,
+    auth : state.auth
   }
 }
 
-  export default connect(mapStateToProps,{deleteProject,getProjects,AuthenticateUser})(singleproject)
+  export default connect(mapStateToProps,{deleteProject,getProjects,getUsers,AuthenticateUser})(singleproject)

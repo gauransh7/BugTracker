@@ -275,7 +275,7 @@ handleEditorChange = (event, editor) => {
               label='Add Media : '
               id="media"
               type='file'
-              accept="image/png, image/jpeg"
+              accept="image/png, image/jpeg, image/jfif, video/mp4, video/webm, video/mov"
               // value = {this.state.image}
               onChange={this.handleImageChange}
             />
