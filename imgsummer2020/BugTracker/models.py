@@ -11,10 +11,13 @@ class User(AbstractUser):
     username = None
     last_name = None
     password = None
-    enr_no = models.BigIntegerField(null=False,unique=True,blank=False)
+    enr_no = models.BigIntegerField(null=False, unique=True, blank=False)
     cur_yr = models.IntegerField(null=True)
     email = models.EmailField(_('email address'), unique=True)
-    image = models.ImageField(default='default.jpg', upload_to='profile_images')
+    image = models.ImageField(
+        default='default.jpg',
+        upload_to='profile_images'
+    )
     USERNAME_FIELD = 'enr_no'
     REQUIRED_FIELDS = []
 
@@ -29,14 +32,24 @@ class User(AbstractUser):
     def countbugs(self):
         return len(list(self.listed_by_user.all()))
 
+
 class Project(models.Model):
     name = models.CharField(max_length=50)
-    creator = models.ForeignKey(User,null=True,related_name='project_creator',on_delete = models.SET_NULL)
-    user = models.ManyToManyField(User,null=True)
+    creator = models.ForeignKey(
+        User,
+        null=True,
+        related_name='project_creator',
+        on_delete=models.SET_NULL
+    )
+    user = models.ManyToManyField(User, null=True)
     wiki = RichTextField()
-    image = models.FileField(null=True,upload_to='project_media',blank=True)
-    attachment = models.FileField(null=True,upload_to='project_attachment',blank=True)
-    status = models.BooleanField(default = True)
+    image = models.FileField(null=True, upload_to='project_media', blank=True)
+    attachment = models.FileField(
+        null=True, 
+        upload_to='project_attachment',
+        blank=True
+    )
+    status = models.BooleanField(default=True)
     created_on = models.DateTimeField(auto_now_add=True)
     launched = models.BooleanField(default=False)
 
@@ -57,47 +70,61 @@ class Project(models.Model):
 
     def usernames(self):
         if (self.user):
-            return  list(map(lambda x: x.first_name,self.user.all()))  
+            return list(map(lambda x: x.first_name, self.user.all()))
 
 
 STATUS_CHOICES = (
-    ('new','New'),
-    ('assigned','Assigned'),
-    ('duplicate','Duplicate'),
-    ('not a bug','Not a Bug'),
-    ('open','Open'),
-    ('fixed','Fixed'),
-    ('retesting','Re-testing'),
-    ('verified','Verified'),
-    ('closed','Closed'),
+    ('new', 'New'),
+    ('assigned', 'Assigned'),
+    ('duplicate', 'Duplicate'),
+    ('not a bug', 'Not a Bug'),
+    ('open', 'Open'),
+    ('fixed', 'Fixed'),
+    ('retesting', 'Re-testing'),
+    ('verified', 'Verified'),
+    ('closed', 'Closed'),
 )
 
+
 class Tag(models.Model):
-    tag_name = models.CharField(max_length = 30)
+    tag_name = models.CharField(max_length=30)
 
     def __str__(self):
-            return self.tag_name
-
+        return self.tag_name
 
 
 class Bug(models.Model):
-    readonly_fields=('heading','description','tags',)
+    readonly_fields = ('heading', 'description', 'tags',)
     heading = models.CharField(max_length=500)
-    user = models.ForeignKey(User, null=True ,related_name='listed_by_user',on_delete = models.SET_NULL)
+    user = models.ForeignKey(
+        User, 
+        null=True, 
+        related_name='listed_by_user',
+        on_delete=models.SET_NULL)
     listed_on = models.DateTimeField(auto_now_add=True)
-    updated_on = models.DateTimeField(auto_now = True)
-    media = models.FileField(null=True,upload_to = 'bugs_media',blank=True)
-    status = models.CharField(max_length=15,choices = STATUS_CHOICES, default = 'New')
-    project = models.ForeignKey(Project,related_name='bugs_project',on_delete=models.CASCADE)
+    updated_on = models.DateTimeField(auto_now=True)
+    media = models.FileField(null=True, upload_to='bugs_media', blank=True)
+    status = models.CharField(max_length=15, 
+                              choices=STATUS_CHOICES,
+                              default='New'
+                              )
+    project = models.ForeignKey(Project, 
+                                related_name='bugs_project',
+                                on_delete=models.CASCADE
+                                )
     description = RichTextField()
-    tag = models.ManyToManyField(Tag,null = True)
-    assign_to = models.ForeignKey(User,null=True,blank=True,related_name='assign_to_user',on_delete=models.SET_NULL)
-    assign_by = models.ForeignKey(User,null=True,blank=True,related_name='assign_by_user',on_delete=models.SET_NULL)
-
+    tag = models.ManyToManyField(Tag, null=True)
+    assign_to = models.ForeignKey(User, null=True, 
+                                  blank=True,
+                                  related_name='assign_to_user',
+                                  on_delete=models.SET_NULL)
+    assign_by = models.ForeignKey(User, null=True, 
+                                  blank=True,
+                                  related_name='assign_by_user',
+                                  on_delete=models.SET_NULL)
 
     objects = models.Manager()
-    
-    
+
     class Meta:
         ordering = ['-listed_on']
 
@@ -121,7 +148,7 @@ class Bug(models.Model):
 
     def projectuser(self):
         if (self.project.user):
-            return list(map(lambda x: x.id,self.project.user.all()))
+            return list(map(lambda x: x.id, self.project.user.all()))
 
     def projectcreatorname(self):
         if self.project.creator:
@@ -129,19 +156,26 @@ class Bug(models.Model):
 
     def projectusername(self):
         if (self.project.user):
-            return list(map(lambda x:x.first_name,self.project.user.all()))
+            return list(map(lambda x: x.first_name, self.project.user.all()))
 
     def tagname(self):
         if (self.tag):
-            return  list(map(lambda x: x.tag_name,self.tag.all()))  
+            return list(map(lambda x: x.tag_name, self.tag.all()))
+
 
 class Comment(models.Model):
-    user = models.ForeignKey(User,null=True,on_delete=models.SET_NULL)
-    bug = models.ForeignKey(Bug,on_delete=models.CASCADE,related_name='bugcomments')
+    user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
+    bug = models.ForeignKey(Bug, 
+                            on_delete=models.CASCADE,
+                            related_name='bugcomments'
+                            )
     description = RichTextField()
-    parent = models.ForeignKey("self", blank=True, null=True,on_delete=models.CASCADE , related_name="comment_parent")
-    status = models.BooleanField(default = 1)
-    listed_on  = models.DateTimeField(auto_now_add = True)
+    parent = models.ForeignKey("self", blank=True, 
+                               null=True,
+                               on_delete=models.CASCADE,
+                               related_name="comment_parent")
+    status = models.BooleanField(default=1)
+    listed_on = models.DateTimeField(auto_now_add=True)
 
     objects = models.Manager()
 
