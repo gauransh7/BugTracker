@@ -1,22 +1,24 @@
-from django.shortcuts import render
 import requests
 import json
+from django.shortcuts import render
 from django.urls import reverse
 from django.http import HttpResponse
-from rest_framework import generics,viewsets
-from BugTracker.models import User,Bug,Project,Comment,Tag
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from BugTracker.serializers import UserSerializer,ProjectSerializer,BugSerializer,CommentSerializer,AuthSerializer,AuthTokenSerializer,TagSerializer
-from rest_framework import permissions
-from BugTracker.permissions import HasProjectPermissions, HasBugPermissions, HasCommentPermissions
-from rest_framework_extensions.mixins import NestedViewSetMixin
-from django.contrib.auth import login
-from knox.views import LoginView as KnoxLoginView
-from rest_framework import serializers
 from django.core.mail import send_mail
 from django.conf import settings
+from django.contrib.auth import login
+from rest_framework import generics,viewsets
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework import permissions
+from rest_framework import serializers
+from rest_framework_extensions.mixins import NestedViewSetMixin
 from decouple import config
+from knox.views import LoginView as KnoxLoginView
+
+from BugTracker.models import User,Bug,Project,Comment,Tag
+from BugTracker.serializers import UserSerializer,ProjectSerializer,BugSerializer,CommentSerializer,AuthSerializer,AuthTokenSerializer,TagSerializer
+from BugTracker.permissions import HasProjectPermissions, HasBugPermissions, HasCommentPermissions
+
 
 # Create your views here.
 def index(request):
